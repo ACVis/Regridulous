@@ -1,7 +1,70 @@
 import Phaser from "phaser";
+import { CST } from "./src/objects/Constants";
+import { enemies } from "./src/objects/Enemies";
+import { Random } from "random-js";
 import images from "./assets/*.png";
 import tileset from "./assets/tileset/*.png";
 
+const random = new Random();
+
+function generateMap(mapWidth, mapLength) {
+    let map = [];
+    for (let row = 0; row < mapLength; row++) {
+        map.push([]);
+        for (let col = 0; col < mapWidth; col++) {
+            // const tileSeed = Math.floor(Math.random() * 100);
+            const tileSeed = random.integer(1, 100);
+            const tileType = null;
+
+            if (tileSeed <= 30) {
+                tileType = "wall";
+            } else if (tileSeed > 30) {
+                tileType = "ground";
+            } else {
+                tileType = "ground";
+            }
+            let tileNum = 0;
+            switch (tileType) {
+                case "ground":
+                    break;
+                case "wall":
+                    break;
+            }
+            if (tileType === "ground") {
+                tileNum = 19;
+            } else {
+                tileNum = Math.floor((Math.random() % 0.64) * 100);
+            }
+            map[row].push(tileNum);
+        }
+    }
+    return map;
+}
+function addEnemies(map) {
+    for (let row = 0; row < map.length; row++) {
+        for (let col = 0; col < map[row].length; col++) {
+            // const enemySeed = Math.floor(Math.random() * 100);
+            const enemySeed = random.integer(1, 100);
+            let isEnemy = false;
+            let enemyType = null;
+
+            if (enemySeed <= 30) {
+                isEnemy = true;
+                enemyType = "template";
+            }
+            let tileNum = 0;
+            switch (enemyType) {
+                case "ground":
+                    break;
+                case "wall":
+                    break;
+            }
+
+            // map[row].push(tileNum);
+        }
+    }
+    return map;
+}
 class mainScene {
     preload() {
         this.load.image("player", images.player);
@@ -10,33 +73,19 @@ class mainScene {
     }
 
     create() {
-        const TILE_SIZE = 16;
-        const GRID_WIDTH = 13;
-        const GRID_LENGTH = GRID_WIDTH * 2;
-        let LEVEL = [];
+        let MAP = generateMap(CST.GRID_WIDTH, CST.GRID_LENGTH);
+        let ENEMIES = addEnemies(MAP);
 
-        const playerStartX = Math.ceil(GRID_WIDTH / 2) * TILE_SIZE;
-        const playerStartY = GRID_LENGTH * TILE_SIZE - TILE_SIZE;
+        console.log("Map:", MAP);
 
-        for (let row = 0; row < GRID_LENGTH; row++) {
-            LEVEL.push([]);
-            for (let col = 0; col < GRID_WIDTH; col++) {
-                const isWall = Math.random() <= 0.75;
-                let tileNum = 0;
-                if (isWall) {
-                    tileNum = 19;
-                } else {
-                    tileNum = Math.floor((Math.random() % 0.64) * 100);
-                }
-                LEVEL[row].push(tileNum);
-            }
-        }
-        console.log(LEVEL);
+        const playerStartX = Math.ceil(CST.GRID_WIDTH / 2) * CST.TILE_SIZE;
+        const playerStartY = CST.GRID_LENGTH * CST.TILE_SIZE - CST.TILE_SIZE;
+
         // When loading from an array, make sure to specify the tileWidth and tileHeight
         const map = this.make.tilemap({
-            data: LEVEL,
-            tileWidth: TILE_SIZE,
-            tileHeight: TILE_SIZE,
+            data: MAP,
+            tileWidth: CST.TILE_SIZE,
+            tileHeight: CST.TILE_SIZE,
         });
         const tiles = map.addTilesetImage("overworld-tiles");
         const layer = map.createDynamicLayer(0, tiles, 0, 0);
@@ -46,7 +95,7 @@ class mainScene {
             playerStartY,
             "player"
         );
-        this.player.width = TILE_SIZE;
+        this.player.width = CST.TILE_SIZE;
         this.player.setOrigin(0, 0);
 
         let actionsTillTurn = 2;
@@ -118,25 +167,25 @@ class mainScene {
 
         this.input.keyboard.on("keyup-RIGHT", (event) => {
             takeTurn();
-            this.player.x += TILE_SIZE;
+            this.player.x += CST.TILE_SIZE;
             console.log(this.player.width, this.player.displayWidth);
 
             console.log("right up!");
         });
         this.input.keyboard.on("keyup-DOWN", (event) => {
             takeTurn();
-            this.player.y += TILE_SIZE;
+            this.player.y += CST.TILE_SIZE;
 
             console.log("down up!");
         });
         this.input.keyboard.on("keyup-LEFT", (event) => {
             takeTurn();
-            this.player.x -= TILE_SIZE;
+            this.player.x -= CST.TILE_SIZE;
             console.log("right up!");
         });
         this.input.keyboard.on("keyup-UP", (event) => {
             takeTurn();
-            this.player.y -= TILE_SIZE;
+            this.player.y -= CST.TILE_SIZE;
 
             console.log("down up!");
         });
