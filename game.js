@@ -1,37 +1,94 @@
 import Phaser from "phaser";
+import { CST } from "./src/objects/Constants";
+import { enemies } from "./src/objects/Enemies";
+import { Utils } from "./src/objects/Utilities";
+import { Random } from "random-js";
 import images from "./assets/*.png";
 import tileset from "./assets/tileset/*.png";
+
+const random = new Random();
+
+function generateMap(mapWidth, mapLength) {
+    let map = [];
+    for (let row = 0; row < mapLength; row++) {
+        map.push([]);
+        for (let col = 0; col < mapWidth; col++) {
+            // const tileSeed = Math.floor(Math.random() * 100);
+            const tileSeed = random.integer(1, 100);
+            const tileType = null;
+
+            if (tileSeed <= 30) {
+                tileType = "wall";
+            } else if (tileSeed > 30) {
+                tileType = "ground";
+            } else {
+                tileType = "ground";
+            }
+            let tileNum = 0;
+            switch (tileType) {
+                case "ground":
+                    break;
+                case "wall":
+                    break;
+            }
+            if (tileType === "ground") {
+                tileNum = 19;
+            } else {
+                tileNum = Math.floor((Math.random() % 0.64) * 100);
+            }
+            map[row].push(tileNum);
+        }
+    }
+    return map;
+}
 
 class mainScene {
     preload() {
         this.load.image("player", images.player);
+        this.load.image("enemy_basic", images.enemy_basic);
         this.load.image("coin", images.coin);
         this.load.image("overworld-tiles", tileset.OverworldTileset_v03);
     }
+    addEnemies(map) {
+        this.enemies = this.add.group();
+        for (let row = 0; row < map.length; row++) {
+            for (let col = 0; col < map[row].length; col++) {
+                // const enemySeed = Math.floor(Math.random() * 100);
+                console.log("Tile x,y", row, col);
+                const enemySeed = random.integer(1, 100);
+                let isEnemy = false;
+                let enemyType = null;
 
-    create() {
-        const TILE_SIZE = 16;
-        const GRID_WIDTH = 13;
-        const GRID_LENGTH = GRID_WIDTH * 2;
-        let LEVEL = [];
-
-        const playerStartX = Math.ceil(GRID_WIDTH / 2) * TILE_SIZE;
-        const playerStartY = GRID_LENGTH * TILE_SIZE - TILE_SIZE;
-
-        for (let row = 0; row < GRID_LENGTH; row++) {
-            LEVEL.push([]);
-            for (let col = 0; col < GRID_WIDTH; col++) {
-                const isWall = Math.random() <= 0.75;
-                let tileNum = 0;
-                if (isWall) {
-                    tileNum = 19;
-                } else {
-                    tileNum = Math.floor((Math.random() % 0.64) * 100);
+                if (map[row][col] === 19 && enemySeed <= 20) {
+                    this.enemies.create(
+                        Utils.ColToX(col),
+                        Utils.RowToY(row),
+                        "enemy_basic"
+                    );
+                    isEnemy = true;
+                    enemyType = "template";
                 }
-                LEVEL[row].push(tileNum);
+                let tileNum = 0;
+                switch (enemyType) {
+                    case "ground":
+                        break;
+                    case "wall":
+                        break;
+                }
+
+                // map[row].push(tileNum);
             }
         }
-        console.log(LEVEL);
+        return map;
+    }
+    create() {
+        let MAP = generateMap(CST.GRID_WIDTH, CST.GRID_LENGTH);
+
+        console.log("Map:", MAP);
+
+        const playerStartX = Math.ceil(CST.GRID_WIDTH / 2) * CST.TILE_SIZE;
+        const playerStartY = CST.GRID_LENGTH * CST.TILE_SIZE - CST.TILE_SIZE;
+
         // When loading from an array, make sure to specify the tileWidth and tileHeight
         const map = this.make.tilemap({
             data: LEVEL,
@@ -41,12 +98,14 @@ class mainScene {
         const tiles = map.addTilesetImage("overworld-tiles");
         const layer = map.createDynamicLayer(0, tiles, 0, 0);
 
-        this.player = this.physics.add.sprite(
-            playerStartX,
-            playerStartY,
-            "player"
-        );
-        this.player.width = TILE_SIZE;
+        // this.player = this.physics.add.sprite(
+        //     playerStartX,
+        //     playerStartY,
+        //     "player"
+        // );
+        let ENEMIES = this.addEnemies(MAP);
+        this.player = this.add.sprite(playerStartX, playerStartY, "player");
+        this.player.width = CST.TILE_SIZE;
         this.player.setOrigin(0, 0);
 
         let actionsTillTurn = 2;
