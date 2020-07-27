@@ -27,5 +27,12 @@ function ColToX(col) {
     const x = col * CST.TILE_SIZE;
     return x;
 }
-
-export { XYtoRC, YtoRow, XtoCol, RCtoXY, RowToY, ColToX };
+const Utils = Object.freeze({
+    XYtoRC,
+    YtoRow,
+    XtoCol,
+    RCtoXY,
+    RowToY,
+    ColToX,
+});
+export { Utils, XYtoRC, YtoRow, XtoCol, RCtoXY, RowToY, ColToX };

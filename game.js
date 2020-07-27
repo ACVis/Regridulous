@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { CST } from "./src/objects/Constants";
 import { enemies } from "./src/objects/Enemies";
+import { Utils } from "./src/objects/Utilities";
 import { Random } from "random-js";
 import images from "./assets/*.png";
 import tileset from "./assets/tileset/*.png";
@@ -40,41 +41,48 @@ function generateMap(mapWidth, mapLength) {
     }
     return map;
 }
-function addEnemies(map) {
-    for (let row = 0; row < map.length; row++) {
-        for (let col = 0; col < map[row].length; col++) {
-            // const enemySeed = Math.floor(Math.random() * 100);
-            const enemySeed = random.integer(1, 100);
-            let isEnemy = false;
-            let enemyType = null;
 
-            if (enemySeed <= 30) {
-                isEnemy = true;
-                enemyType = "template";
-            }
-            let tileNum = 0;
-            switch (enemyType) {
-                case "ground":
-                    break;
-                case "wall":
-                    break;
-            }
-
-            // map[row].push(tileNum);
-        }
-    }
-    return map;
-}
 class mainScene {
     preload() {
         this.load.image("player", images.player);
+        this.load.image("enemy_basic", images.enemy_basic);
         this.load.image("coin", images.coin);
         this.load.image("overworld-tiles", tileset.OverworldTileset_v03);
     }
+    addEnemies(map) {
+        this.enemies = this.add.group();
+        for (let row = 0; row < map.length; row++) {
+            for (let col = 0; col < map[row].length; col++) {
+                // const enemySeed = Math.floor(Math.random() * 100);
+                console.log("Tile x,y", row, col);
+                const enemySeed = random.integer(1, 100);
+                let isEnemy = false;
+                let enemyType = null;
 
+                if (map[row][col] === 19 && enemySeed <= 20) {
+                    this.enemies.create(
+                        Utils.ColToX(col),
+                        Utils.RowToY(row),
+                        "enemy_basic"
+                    );
+                    isEnemy = true;
+                    enemyType = "template";
+                }
+                let tileNum = 0;
+                switch (enemyType) {
+                    case "ground":
+                        break;
+                    case "wall":
+                        break;
+                }
+
+                // map[row].push(tileNum);
+            }
+        }
+        return map;
+    }
     create() {
         let MAP = generateMap(CST.GRID_WIDTH, CST.GRID_LENGTH);
-        let ENEMIES = addEnemies(MAP);
 
         console.log("Map:", MAP);
 
@@ -90,11 +98,13 @@ class mainScene {
         const tiles = map.addTilesetImage("overworld-tiles");
         const layer = map.createDynamicLayer(0, tiles, 0, 0);
 
-        this.player = this.physics.add.sprite(
-            playerStartX,
-            playerStartY,
-            "player"
-        );
+        // this.player = this.physics.add.sprite(
+        //     playerStartX,
+        //     playerStartY,
+        //     "player"
+        // );
+        let ENEMIES = this.addEnemies(MAP);
+        this.player = this.add.sprite(playerStartX, playerStartY, "player");
         this.player.width = CST.TILE_SIZE;
         this.player.setOrigin(0, 0);
 
