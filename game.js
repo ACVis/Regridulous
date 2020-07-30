@@ -1,46 +1,11 @@
 import Phaser from "phaser";
 import { CST } from "./src/objects/Constants";
 import { enemies } from "./src/objects/Enemies";
-import { Utils } from "./src/objects/Utilities";
-import { Random } from "random-js";
+import { Player } from "./src/objects/Player";
+import { MapManager } from "./src/objects/Map";
+import { Utils, Random } from "./src/objects/Utilities";
 import images from "./assets/*.png";
 import tileset from "./assets/tileset/*.png";
-
-const random = new Random();
-
-function generateMap(mapWidth, mapLength) {
-    let map = [];
-    for (let row = 0; row < mapLength; row++) {
-        map.push([]);
-        for (let col = 0; col < mapWidth; col++) {
-            // const tileSeed = Math.floor(Math.random() * 100);
-            const tileSeed = random.integer(1, 100);
-            const tileType = null;
-
-            if (tileSeed <= 30) {
-                tileType = "wall";
-            } else if (tileSeed > 30) {
-                tileType = "ground";
-            } else {
-                tileType = "ground";
-            }
-            let tileNum = 0;
-            switch (tileType) {
-                case "ground":
-                    break;
-                case "wall":
-                    break;
-            }
-            if (tileType === "ground") {
-                tileNum = 19;
-            } else {
-                tileNum = Math.floor((Math.random() % 0.64) * 100);
-            }
-            map[row].push(tileNum);
-        }
-    }
-    return map;
-}
 
 class mainScene {
     preload() {
@@ -55,7 +20,7 @@ class mainScene {
             for (let col = 0; col < map[row].length; col++) {
                 // const enemySeed = Math.floor(Math.random() * 100);
                 console.log("Tile x,y", row, col);
-                const enemySeed = random.integer(1, 100);
+                const enemySeed = Random.integer(1, 100);
                 let isEnemy = false;
                 let enemyType = null;
 
@@ -83,25 +48,15 @@ class mainScene {
         return map;
     }
     create() {
-        let MAP = generateMap(CST.GRID_WIDTH, CST.GRID_LENGTH);
-        console.log("Map:", MAP);
+        let MAP = new MapManager(this);
+        MAP.generateMap(CST.GRID_WIDTH, CST.GRID_LENGTH);
+        const [map, layer] = MAP.createMap("overworld-tiles");
 
         const playerStartX = Math.ceil(CST.GRID_WIDTH / 2) * CST.TILE_SIZE;
         const playerStartY = CST.GRID_LENGTH * CST.TILE_SIZE - CST.TILE_SIZE;
 
-        // When loading from an array, make sure to specify the tileWidth and tileHeight
-        const map = this.make.tilemap({
-            data: MAP,
-            tileWidth: CST.TILE_SIZE,
-            tileHeight: CST.TILE_SIZE,
-        });
-        const tiles = map.addTilesetImage("overworld-tiles");
-        const mapLayer = map.createDynamicLayer(0, tiles, 0, 0);
-
         let ENEMIES = this.addEnemies(MAP);
-        this.player = this.add.sprite(playerStartX, playerStartY, "player");
-        this.player.width = CST.TILE_SIZE;
-        this.player.setOrigin(0, 0);
+        this.player = this.add.player(playerStartX, playerStartY);
 
         let actionsTillTurn = 2;
         let isTurn = false;
@@ -226,82 +181,5 @@ class mainScene {
         // }
     }
 }
-
-const config1 = {
-    width: 640,
-    height: 480,
-    backgroundColor: "#3498db",
-    scene: mainScene,
-    physics: { default: "arcade" },
-    parent: "game",
-    pixelArt: true,
-    scale: {
-        zoom: 1.5,
-    },
-};
-const config2 = {
-    // type: Phaser.AUTO,
-    backgroundColor: "#3498db",
-    pixelArt: true,
-    physics: { default: "arcade" },
-    scale: {
-        mode: Phaser.Scale.NONE,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        parent: "game",
-        width: 1280,
-        height: 720,
-        // zoom: Phaser.Scale.FIT,
-    },
-    scene: mainScene,
-};
-//zoom/scaling info: https://phaser.discourse.group/t/help-with-scaling-for-pixel-art/4782/2
-//use scale manager zoom
-let config3 = {
-    // width: 1280,
-    // height: 720,
-    backgroundColor: "#3498db",
-    scene: mainScene,
-    physics: { default: "arcade" },
-    parent: "game",
-    pixelArt: true,
-    scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 256,
-        height: 192,
-        zoom: 2,
-        min: {
-            width: 185,
-            height: 90,
-        },
-        max: {
-            width: 320,
-            height: 200,
-        },
-    },
-    // …
-};
-//use camera zoom
-let config4 = {
-    backgroundColor: "#3498db",
-    scene: mainScene,
-    physics: { default: "arcade" },
-    parent: "game",
-    pixelArt: true,
-    scale: {
-        mode: Phaser.Scale.FIT,
-        autoCenter: Phaser.Scale.CENTER_BOTH,
-        width: 1024,
-        height: 768,
-        // min: {
-        //     width: 740,
-        //     height: 360,
-        // },
-        // max: {
-        //     width: 1280,
-        //     height: 800,
-        // },
-    },
-    // …
-};
-new Phaser.Game(config4);
+// export { mainScene };
+new Phaser.Game(Object.assign(CST.CONFIGS.config4, { scene: mainScene }));
