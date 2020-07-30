@@ -1,4 +1,5 @@
 import Phaser from "phaser";
+import { CST } from "../objects/Constants";
 /*
             //Stat Type
             {
@@ -41,12 +42,13 @@ const basic = {
 //     }
 // }
 class Enemy extends Phaser.GameObjects.Sprite {
-    constructor(scene, x, y, textureName) {
+    constructor(scene, x, y, textureName = CST.IMGS.KEYS.ENEMY_BASIC, frame) {
         // var x = scene.player.x;
         // var y = scene.player.y - 16;
 
         super(scene, x, y, textureName);
-
+        this.width = CST.TILE_SIZE;
+        this.setOrigin(0, 0);
         // scene.physics.world.enableBody(this);
         // this.body.velocity.y = -250;
 
@@ -63,7 +65,7 @@ class Enemy extends Phaser.GameObjects.Sprite {
     // spawn(){}
     // despawn(){} //destroy the enemy or deactivate
 }
-
+// Base enemy class would contain common methods and fields, variations would contain different stats, textures/animations and logic
 class BasicEnemy extends Enemy {
     health = 100;
     attack = 10;
@@ -71,8 +73,36 @@ class BasicEnemy extends Enemy {
         super(scene, x, y, textureName);
     }
 }
-const enemies = Object.freeze({
+const enemyTypes = Object.freeze({
     basic: BasicEnemy,
 });
 
-export { enemies };
+//Maybe Enemies tracks and manages all the Enemy instances?
+class EnemyManager {
+    constructor(scene) {
+        this.scene = scene;
+    }
+    create(type, number, x, y) {
+        const enemyType = enemyTypes[type];
+        const enemy = new enemyType();
+
+        this.scene.add.enemy(enemy);
+        return enemy;
+    }
+}
+
+//Technically, we dont want an image key. we want an "object key" and then set the image key seperately based on enemy type
+Phaser.GameObjects.GameObjectFactory.register(
+    CST.IMGS.GAME_OBJECTS.ENEMY,
+    function (x, y) {
+        const enemy = new Enemy(this.scene, x, y);
+        //for some reason this.add.existing doesn't work?
+        // this.add.existing(enemy);
+        this.displayList.add(enemy);
+        this.updateList.add(enemy);
+
+        return enemy;
+    }
+);
+
+export { enemyTypes, EnemyManager };
