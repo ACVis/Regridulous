@@ -58,11 +58,10 @@ class Enemy extends Phaser.GameObjects.Sprite {
         scene.add.existing(this);
     }
     update() {
-        // 3.4 Frustum culling
-        // if (this.y < 32) {
-        //     this.destroy();
-        // }
+        //take turn
     }
+    // spawn(){}
+    // despawn(){} //destroy the enemy or deactivate
 }
 
 class BasicEnemy extends Enemy {
