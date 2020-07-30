@@ -60,11 +60,12 @@ class mainScene {
                 let enemyType = null;
 
                 if (map[row][col] === 19 && enemySeed <= 20) {
-                    this.enemies.create(
+                    let newEnemy = this.enemies.create(
                         Utils.ColToX(col),
                         Utils.RowToY(row),
                         "enemy_basic"
                     );
+                    newEnemy.setOrigin(0, 0);
                     isEnemy = true;
                     enemyType = "template";
                 }
@@ -83,7 +84,6 @@ class mainScene {
     }
     create() {
         let MAP = generateMap(CST.GRID_WIDTH, CST.GRID_LENGTH);
-
         console.log("Map:", MAP);
 
         const playerStartX = Math.ceil(CST.GRID_WIDTH / 2) * CST.TILE_SIZE;
@@ -96,13 +96,8 @@ class mainScene {
             tileHeight: TILE_SIZE,
         });
         const tiles = map.addTilesetImage("overworld-tiles");
-        const layer = map.createDynamicLayer(0, tiles, 0, 0);
+        const mapLayer = map.createDynamicLayer(0, tiles, 0, 0);
 
-        // this.player = this.physics.add.sprite(
-        //     playerStartX,
-        //     playerStartY,
-        //     "player"
-        // );
         let ENEMIES = this.addEnemies(MAP);
         this.player = this.add.sprite(playerStartX, playerStartY, "player");
         this.player.width = CST.TILE_SIZE;
@@ -200,12 +195,6 @@ class mainScene {
             console.log("down up!");
         });
 
-        this.coin = this.physics.add.sprite(300, 200, "coin");
-
-        this.score = 0;
-        let style = { font: "20px Arial", fill: "#fff" };
-        this.scoreText = this.add.text(20, 20, "score: " + this.score, style);
-
         this.arrow = this.input.keyboard.createCursorKeys();
         console.log("Map Width: ", map.widthInPixels);
         console.log("Player X Y: ", this.player.x, this.player.y);
@@ -235,22 +224,6 @@ class mainScene {
         // } else if (this.arrow.up.isDown) {
         //     this.player.y -= 3;
         // }
-    }
-
-    hit() {
-        this.coin.x = Phaser.Math.Between(100, 600);
-        this.coin.y = Phaser.Math.Between(100, 200);
-
-        this.score += 10;
-        this.scoreText.setText("score: " + this.score);
-
-        this.tweens.add({
-            targets: this.player,
-            duration: 200,
-            scaleX: 1.2,
-            scaleY: 1.2,
-            yoyo: true,
-        });
     }
 }
 
@@ -320,14 +293,14 @@ let config4 = {
         autoCenter: Phaser.Scale.CENTER_BOTH,
         width: 1024,
         height: 768,
-        min: {
-            width: 740,
-            height: 360,
-        },
-        max: {
-            width: 1280,
-            height: 800,
-        },
+        // min: {
+        //     width: 740,
+        //     height: 360,
+        // },
+        // max: {
+        //     width: 1280,
+        //     height: 800,
+        // },
     },
     // …
 };
