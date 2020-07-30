@@ -1,6 +1,6 @@
 import Phaser from "phaser";
 import { CST } from "./src/objects/Constants";
-import { enemies } from "./src/objects/Enemies";
+// import { Enemies } from "./src/objects/Enemies";
 import { Player } from "./src/objects/Player";
 import { MapManager } from "./src/objects/Map";
 import { Utils, Random } from "./src/objects/Utilities";
