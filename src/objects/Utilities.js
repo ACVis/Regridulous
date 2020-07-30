@@ -1,4 +1,5 @@
 import { CST } from "./Constants";
+import { Random as RandomJs } from "random-js";
 // Should probably create tests. Also, tbh, these could probably be replaced by built in Phaser functionality
 function XYtoRC(x, y) {
     const row = (CST.TILE_SIZE * CST.GRID_LENGTH) / y;
@@ -27,6 +28,9 @@ function ColToX(col) {
     const x = col * CST.TILE_SIZE;
     return x;
 }
+
+const Random = new RandomJs();
+
 const Utils = Object.freeze({
     XYtoRC,
     YtoRow,
@@ -34,5 +38,7 @@ const Utils = Object.freeze({
     RCtoXY,
     RowToY,
     ColToX,
+    Random,
 });
-export { Utils, XYtoRC, YtoRow, XtoCol, RCtoXY, RowToY, ColToX };
+
+export { Utils, XYtoRC, YtoRow, XtoCol, RCtoXY, RowToY, ColToX, Random };
