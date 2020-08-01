@@ -15,6 +15,10 @@ const CST = Object.freeze({
     IMGS: {
         KEYS: {
             PLAYER: "player",
+            ENEMY_BASIC: "enemy_basic",
+        },
+        GAME_OBJECTS: {
+            ENEMY: "enemy",
         },
     },
     //Game configs
