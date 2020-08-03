@@ -79,8 +79,9 @@ const enemyTypes = Object.freeze({
 
 //Maybe Enemies tracks and manages all the Enemy instances?
 class EnemyManager {
-    constructor(scene) {
+    constructor(scene, map = []) {
         this.scene = scene;
+        this.map = map;
     }
     create(type, number, x, y) {
         const enemyType = enemyTypes[type];

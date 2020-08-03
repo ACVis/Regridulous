@@ -19,6 +19,12 @@ import { isEmpty } from "lodash-es";
 //     update() {
 //     }
 // }
+const TILE_TYPE = {
+    wall: 0,
+    ground: 19,
+    getRandom: () => Random.integer(1, 64),
+};
+Object.freeze(TILE_TYPE);
 
 class MapManager {
     constructor(scene, mapWidth = null, mapLength = null, tileSet = null) {
@@ -29,7 +35,7 @@ class MapManager {
         this.tileMap = [];
         this.scene = scene;
     }
-    generateMap(mapWidth = CST.GRID_WIDTH, mapLength = CST.GRID_LENGTH) {
+    generateMap_orig(mapWidth = CST.GRID_WIDTH, mapLength = CST.GRID_LENGTH) {
         let map = [];
         for (let row = 0; row < mapLength; row++) {
             map.push([]);
@@ -64,23 +70,70 @@ class MapManager {
         this.tileMap = map;
         return this.tileMap;
     }
+    genTileType(/* maybe feed the row in? */) {
+        // const tileSeed = Math.floor(Math.random() * 100);
+        const tileSeed = Random.integer(1, 100);
+
+        if (tileSeed > 75) {
+            return TILE_TYPE.wall;
+        } else if (tileSeed > 25) {
+            return TILE_TYPE.ground;
+        } else {
+            return TILE_TYPE.getRandom();
+        }
+    }
+    generateMap(mapWidth = CST.GRID_WIDTH, mapLength = CST.GRID_LENGTH) {
+        let map = [];
+
+        for (let row = 0; row < mapLength; row++) {
+            map.push([]);
+            for (let col = 0; col < mapWidth; col++) {
+                let tileNum = this.genTileType();
+
+                switch (tileNum) {
+                    case TILE_TYPE.ground:
+                        break;
+                    case TILE_TYPE.wall:
+                        break;
+                }
+                // may want to replace this by using a TileEntity class
+                const tileEntity = { col, row, index: tileNum };
+                map[row].push(tileEntity);
+            }
+        }
+        this.tileMap = map;
+        return this.tileMap;
+    }
+    getTileArray() {
+        let output = [];
+        this.tileMap.forEach((row) => {
+            const mappedRow = row.map((tile) => tile.index);
+            output.push(mappedRow);
+        });
+        return output;
+    }
+    getMap() {
+        return this.tileMap;
+    }
+    // getMapCopy() {
+    //
+    // }
     createMap(
         tileSet,
         tileMap = [],
         tileWidth = CST.TILE_SIZE,
         tileHeight = CST.TILE_SIZE
     ) {
+        const internalMap = this.getTileArray();
         //If no tilemap passed and none on object, throw error
-        if (isEmpty(tileMap) && isEmpty(this.tileMap)) {
+        if (isEmpty(tileMap) && isEmpty(internalMap)) {
             throw new Error("No Tilemap Set");
         }
         //if passed tileMap empty and on-object is not, take the on-object version
-        else if (isEmpty(tileMap) && !isEmpty(this.tileMap)) {
-            tileMap = this.tileMap;
-        }
-        //if this.tileMap is empty, set it to the passed in tilemap
-        else {
-            this.tileMap = tileMap;
+        else if (isEmpty(tileMap) && !isEmpty(internalMap)) {
+            tileMap = internalMap;
+        } else {
+            //
         }
         const map = this.scene.make.tilemap({
             data: tileMap,
@@ -90,7 +143,7 @@ class MapManager {
         const tiles = map.addTilesetImage(tileSet);
 
         const layer = map.createDynamicLayer(0, tiles, 0, 0);
-        this.mapLayer = layer;
+        // this.mapLayer = layer;
         return [map, layer];
     }
     toString() {

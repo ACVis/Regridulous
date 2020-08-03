@@ -14,6 +14,10 @@ class mainScene {
         this.load.image("coin", images.coin);
         this.load.image("overworld-tiles", tileset.OverworldTileset_v03);
     }
+    //TODO: Redo
+    //either pass the MapManager map in, or grab it from some global store, whether it's records or our own
+    //iterate and check whether square has terrain
+    //add enemies
     addEnemies(map) {
         this.enemies = this.add.group();
         for (let row = 0; row < map.length; row++) {
@@ -51,7 +55,7 @@ class mainScene {
         let MAP = new MapManager(this);
         MAP.generateMap(CST.GRID_WIDTH, CST.GRID_LENGTH);
         const [map, layer] = MAP.createMap("overworld-tiles");
-
+        console.log(layer);
         const playerStartX = Math.ceil(CST.GRID_WIDTH / 2) * CST.TILE_SIZE;
         const playerStartY = CST.GRID_LENGTH * CST.TILE_SIZE - CST.TILE_SIZE;
 
