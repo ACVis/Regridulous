@@ -3,6 +3,7 @@ import { CST } from "./src/objects/Constants";
 // import { Enemies } from "./src/objects/Enemies";
 import { Player } from "./src/objects/Player";
 import { MapManager } from "./src/objects/Map";
+import { EnemyManager } from "./src/objects/Enemies";
 import { Utils, Random } from "./src/objects/Utilities";
 import images from "./assets/*.png";
 import tileset from "./assets/tileset/*.png";
@@ -14,52 +15,22 @@ class mainScene {
         this.load.image("coin", images.coin);
         this.load.image("overworld-tiles", tileset.OverworldTileset_v03);
     }
-    //TODO: Redo
-    //either pass the MapManager map in, or grab it from some global store, whether it's records or our own
-    //iterate and check whether square has terrain
-    //add enemies
-    addEnemies(map) {
-        this.enemies = this.add.group();
-        for (let row = 0; row < map.length; row++) {
-            for (let col = 0; col < map[row].length; col++) {
-                // const enemySeed = Math.floor(Math.random() * 100);
-                console.log("Tile x,y", row, col);
-                const enemySeed = Random.integer(1, 100);
-                let isEnemy = false;
-                let enemyType = null;
-
-                if (map[row][col] === 19 && enemySeed <= 20) {
-                    let newEnemy = this.enemies.create(
-                        Utils.ColToX(col),
-                        Utils.RowToY(row),
-                        "enemy_basic"
-                    );
-                    newEnemy.setOrigin(0, 0);
-                    isEnemy = true;
-                    enemyType = "template";
-                }
-                let tileNum = 0;
-                switch (enemyType) {
-                    case "ground":
-                        break;
-                    case "wall":
-                        break;
-                }
-
-                // map[row].push(tileNum);
-            }
-        }
-        return map;
-    }
     create() {
+        //Generate and Create Map
         let MAP = new MapManager(this);
         MAP.generateMap(CST.GRID_WIDTH, CST.GRID_LENGTH);
         const [map, layer] = MAP.createMap("overworld-tiles");
-        console.log(layer);
+        console.log(MAP.getMap());
+        console.log(MAP.getTileArray());
+
+        //Create Enemies
+        const ENEMIES = new EnemyManager(this, MAP.getTileArray());
+        //This adds enemies as sprites for now
+        ENEMIES.addEnemies(MAP.getTileArray());
+
+        //Create Player
         const playerStartX = Math.ceil(CST.GRID_WIDTH / 2) * CST.TILE_SIZE;
         const playerStartY = CST.GRID_LENGTH * CST.TILE_SIZE - CST.TILE_SIZE;
-
-        let ENEMIES = this.addEnemies(MAP);
         this.player = this.add.player(playerStartX, playerStartY);
 
         let actionsTillTurn = 2;

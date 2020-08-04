@@ -76,7 +76,7 @@ class MapManager {
 
         if (tileSeed > 75) {
             return TILE_TYPE.wall;
-        } else if (tileSeed > 25) {
+        } else if (tileSeed > 20) {
             return TILE_TYPE.ground;
         } else {
             return TILE_TYPE.getRandom();
@@ -151,4 +151,4 @@ class MapManager {
     }
 }
 
-export { MapManager };
+export { MapManager, TILE_TYPE };

@@ -1,5 +1,7 @@
 import Phaser from "phaser";
 import { CST } from "../objects/Constants";
+import { TILE_TYPE } from "./Map";
+import { Utils, Random } from "./Utilities";
 /*
             //Stat Type
             {
@@ -69,12 +71,21 @@ class Enemy extends Phaser.GameObjects.Sprite {
 class BasicEnemy extends Enemy {
     health = 100;
     attack = 10;
-    constructor(scene, x, y, textureName) {
+    sprite = "enemy_basic";
+    constructor(scene, col, row, textureName = this.sprite, x, y) {
+        x = x ? x : Utils.ColToX(col);
+        y = y ? y : Utils.RowToY(row);
         super(scene, x, y, textureName);
+        this.col = col;
+        this.row = row;
+        // console.log("col, row, x, y", col, row, x, y);
     }
 }
-const enemyTypes = Object.freeze({
+const ENEMY_TYPES = Object.freeze({
     basic: BasicEnemy,
+});
+const ENEMY_SPRITE = Object.freeze({
+    basic: "enemy_basic",
 });
 
 //Maybe Enemies tracks and manages all the Enemy instances?
@@ -82,13 +93,65 @@ class EnemyManager {
     constructor(scene, map = []) {
         this.scene = scene;
         this.map = map;
+        this.enemiesArray = [];
+        this.enemiesGroup = this.scene.add.group();
+        this.enemies = [];
     }
     create(type, number, x, y) {
-        const enemyType = enemyTypes[type];
+        const enemyType = ENEMY_TYPES[type];
         const enemy = new enemyType();
 
         this.scene.add.enemy(enemy);
         return enemy;
+    }
+    addEnemies(map) {
+        console.log("THE MAP", map);
+        for (let row = 0; row < map.length; row++) {
+            if (!this.enemiesArray[row]) {
+                this.enemiesArray[row] = [];
+            }
+            for (let col = 0; col < map[row].length; col++) {
+                // const enemySeed = Math.floor(Math.random() * 100);
+                console.log("Tile x,y", row, col);
+                const enemySeed = Random.integer(1, 100);
+                let isEnemy = false;
+                let enemyType = null;
+
+                if (map[row][col] === TILE_TYPE.ground && enemySeed <= 15) {
+                    const x = Utils.ColToX(col);
+                    const y = Utils.RowToY(row);
+                    const enemyObject = {
+                        col,
+                        row,
+                        sprite: ENEMY_SPRITE.basic,
+                    };
+                    const enemy = new BasicEnemy(
+                        this.scene,
+                        col,
+                        row,
+                        ENEMY_SPRITE.basic
+                    );
+                    // this.enemies.push(enemyObject);
+                    // this.enemiesArray[row].push(enemyObject);
+                    this.enemies.push(enemy);
+                    this.enemiesArray[row].push(enemy);
+
+                    // let newEnemy = this.enemies.create(
+                    //     Utils.ColToX(col),
+                    //     Utils.RowToY(row),
+                    //     ENEMY_SPRITE.basic
+                    // );
+                    // newEnemy.setOrigin(0, 0);
+                    // isEnemy = true;
+                    // enemyType = "template";
+                }
+            }
+        }
+        this.enemies.forEach((enemy) => {
+            console.log(enemy);
+            this.scene.add.existing(enemy);
+        });
+        return map;
     }
 }
 
@@ -106,4 +169,4 @@ Phaser.GameObjects.GameObjectFactory.register(
     }
 );
 
-export { enemyTypes, EnemyManager };
+export { ENEMY_TYPES, ENEMY_SPRITE, EnemyManager };
