@@ -99,6 +99,14 @@ class mainScene {
                 //enemies
             }
         }
+        //NOTE:
+        /*
+        Do statemachine for controls
+        Default: can move, can do spells, etc
+        Aiming (spells): can attempt to use spell (click on a square) or can cancel 
+        Inventory: managing shit
+        Menu: of any kind. select shit or exit menu. cant move, etc.
+        */
 
         this.input.keyboard.on("keyup-RIGHT", (event) => {
             takeTurn();
