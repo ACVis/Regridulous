@@ -8,11 +8,11 @@ function XYtoRC(x, y) {
 }
 function YtoRow(y) {
     const row = (CST.TILE_SIZE * CST.GRID_LENGTH) / y;
-    return [row, col];
+    return row;
 }
 function XtoCol(y) {
-    const row = (CST.TILE_SIZE * CST.GRID_LENGTH) / y;
-    return [row, col];
+    const col = (CST.TILE_SIZE * CST.GRID_LENGTH) / y;
+    return col;
 }
 function RCtoXY(row, col) {
     const x = CST.TILE_SIZE * col;
