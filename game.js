@@ -7,6 +7,7 @@ import { EnemyManager } from "./src/objects/Enemies";
 import { Utils, Random } from "./src/objects/Utilities";
 import images from "./assets/*.png";
 import tileset from "./assets/tileset/*.png";
+import { TextSprite } from "phaser-ui-tools";
 
 class mainScene {
     preload() {
@@ -16,26 +17,41 @@ class mainScene {
         this.load.image("overworld-tiles", tileset.OverworldTileset_v03);
     }
     create() {
+        //Set Scene debug mode
+        this.debug = true;
+        if (this.debug) console.log("DEBUG MODE");
+
         //Generate and Create Map
         let MAP = new MapManager(this);
         MAP.generateMap(CST.GRID_WIDTH, CST.GRID_LENGTH);
         const [map, layer] = MAP.createMap("overworld-tiles");
-        console.log(MAP.getMap());
-        console.log(MAP.getTileArray());
+
+        if (this.debug) console.log(MAP.getMap());
+        if (this.debug) console.log(MAP.getTileArray());
 
         //Create Enemies
-        const ENEMIES = new EnemyManager(this, MAP.getTileArray());
+        // const ENEMIES = new EnemyManager(this, MAP.getTileArray());
         //This adds enemies as sprites for now
-        ENEMIES.addEnemies(MAP.getTileArray());
+        // ENEMIES.addEnemies(MAP.getTileArray());
 
         //Create Player
-        const playerStartX = Math.ceil(CST.GRID_WIDTH / 2) * CST.TILE_SIZE;
+        const gridHalf = Math.floor(CST.GRID_WIDTH / 2);
+        const playerStartX = gridHalf * CST.TILE_SIZE;
         const playerStartY = CST.GRID_LENGTH * CST.TILE_SIZE - CST.TILE_SIZE;
         this.player = this.add.player(playerStartX, playerStartY);
+        //Set Player debug mode
+        this.player.debug = true;
 
         let actionsTillTurn = 2;
         let isTurn = false;
 
+        //Create UI
+
+        this.add.text(
+            CST.WINDOW_WIDTH / 2 + CST.TILE_SIZE * 2.5,
+            CST.TILE_SIZE,
+            "UI OVER HERE"
+        );
         /*
             //Stat Type
             {
@@ -107,39 +123,44 @@ class mainScene {
         Inventory: managing shit
         Menu: of any kind. select shit or exit menu. cant move, etc.
         */
+        // const movePlayer = this.player.getAction("move");
+        // movePlayer(this.player, { row: 1 });
 
         this.input.keyboard.on("keyup-RIGHT", (event) => {
-            takeTurn();
-            this.player.x += CST.TILE_SIZE;
-            console.log(this.player.width, this.player.displayWidth);
+            if (this.debug) console.log("right up!");
 
-            console.log("right up!");
+            // takeTurn();
+            // this.player.x += CST.TILE_SIZE;
+            // console.log(this.player.width, this.player.displayWidth);
+            this.player.moveEnt({ cols: 1 });
         });
         this.input.keyboard.on("keyup-DOWN", (event) => {
-            takeTurn();
-            this.player.y += CST.TILE_SIZE;
-
-            console.log("down up!");
+            if (this.debug) console.log("down up!");
+            // takeTurn();
+            // this.player.y += CST.TILE_SIZE;
+            this.player.moveEnt({ rows: 1 });
         });
         this.input.keyboard.on("keyup-LEFT", (event) => {
-            takeTurn();
-            this.player.x -= CST.TILE_SIZE;
-            console.log("right up!");
+            if (this.debug) console.log("right up!");
+            // takeTurn();
+            // this.player.x -= CST.TILE_SIZE;
+            this.player.moveEnt({ cols: -1 });
         });
         this.input.keyboard.on("keyup-UP", (event) => {
-            takeTurn();
-            this.player.y -= CST.TILE_SIZE;
-
-            console.log("down up!");
+            if (this.debug) console.log("down up!");
+            // takeTurn();
+            // this.player.y -= CST.TILE_SIZE;
+            this.player.moveEnt({ rows: -1 });
         });
 
         this.arrow = this.input.keyboard.createCursorKeys();
         console.log("Map Width: ", map.widthInPixels);
         console.log("Player X Y: ", this.player.x, this.player.y);
+        console.log("Player col row: ", this.player.col, this.player.row);
 
         const camera = this.cameras.main;
         this.cameras.main
-            .setZoom(1.5)
+            // .setZoom(1.5)
             .setBounds(0, 0, map.widthInPixels, map.heightInPixels)
             // .centerOn(this.player.x, this.scale.y);
             .startFollow(this.player);

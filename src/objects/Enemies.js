@@ -105,14 +105,15 @@ class EnemyManager {
         return enemy;
     }
     addEnemies(map) {
-        console.log("THE MAP", map);
+        if (this.debug) console.log("THE MAP", map);
+
         for (let row = 0; row < map.length; row++) {
             if (!this.enemiesArray[row]) {
                 this.enemiesArray[row] = [];
             }
             for (let col = 0; col < map[row].length; col++) {
                 // const enemySeed = Math.floor(Math.random() * 100);
-                console.log("Tile x,y", row, col);
+                if (this.debug) console.log("Tile x,y", row, col);
                 const enemySeed = Random.integer(1, 100);
                 let isEnemy = false;
                 let enemyType = null;
@@ -148,7 +149,7 @@ class EnemyManager {
             }
         }
         this.enemies.forEach((enemy) => {
-            console.log(enemy);
+            if (this.debug) console.log(enemy);
             this.scene.add.existing(enemy);
         });
         return map;

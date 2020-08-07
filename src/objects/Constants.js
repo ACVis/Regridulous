@@ -7,6 +7,8 @@ const CST = Object.freeze({
     TILE_SIZE,
     GRID_WIDTH,
     GRID_LENGTH,
+    WINDOW_WIDTH: (GRID_WIDTH + 0) * TILE_SIZE * 2,
+    WINDOW_HEIGHT: (GRID_LENGTH + 0) * TILE_SIZE,
     /* Could do either, or both of these:
     IMGS.KEYS.PLAYER
     or
@@ -87,8 +89,10 @@ const CST = Object.freeze({
             scale: {
                 mode: Phaser.Scale.FIT,
                 autoCenter: Phaser.Scale.CENTER_BOTH,
-                width: 1024,
-                height: 768,
+                width: (GRID_WIDTH + 0) * TILE_SIZE * 2,
+                height: (GRID_LENGTH + 0) * TILE_SIZE,
+                // width: 1024,
+                // height: 768,
                 // min: {
                 //     width: 740,
                 //     height: 360,

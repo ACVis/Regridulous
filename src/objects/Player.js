@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { Entity } from "./Entity";
-import { CST } from "../objects/Constants";
+import { CST } from "./Constants";
+import { action_Move } from "./Actions";
 const statMixin = {
     Health: 100,
     Defense: 10,
@@ -65,6 +66,7 @@ const basic = {
 class Player extends Entity {
     constructor(scene, x, y, textureName = CST.IMGS.KEYS.PLAYER, frame) {
         super(scene, x, y, textureName);
+        // this.addAction(action_Move);
     }
     //we would have to call this create() function if we didnt add Player to the Factory
     create() {
