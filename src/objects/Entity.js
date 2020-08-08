@@ -69,21 +69,79 @@ class Entity extends Phaser.GameObjects.Sprite {
     constructor(scene, x, y, textureName, frame) {
         super(scene, x, y, textureName);
 
+        this.debug = false;
+
         this.width = CST.TILE_SIZE;
         this.setOrigin(0, 0);
 
         this.col = Utils.XtoCol(x);
         this.row = Utils.YtoRow(y);
+        // this.actionList = [];
         // scene.physics.world.enableBody(this);
         // this.body.velocity.y = -250;
     }
-    moveByGrid({ col, row }) {
-        this.col += col;
-        this.row += row;
+    moveByCR({ cols = 0, rows = 0 }) {
+        this.col += cols;
+        this.row += rows;
         this.x = Utils.ColToX(this.col);
         this.y = Utils.RowToY(this.row);
+
+        if (this.debug) console.log("moveByCR: ", cols, rows);
     }
+    moveByXY({ x = 0, y = 0 }) {
+        this.x += x;
+        this.y += y;
+        this.col += Utils.XtoCol(x);
+        this.row += Utils.YtoRow(y);
+        if (this.debug) console.log("moveByXY: ", x, y);
+    }
+    moveEnt({ cols = 0, rows = 0, x = 0, y = 0 }) {
+        if (this.debug) console.log("moveByEnt: ", arguments);
+        if (this.debug)
+            console.log(
+                "Before Move x,y,col,row: ",
+                this.x,
+                this.y,
+                this.col,
+                this.row
+            );
+        if (cols || rows) {
+            this.moveByCR({ cols, rows });
+        } else if (x || y) {
+            this.moveByXY({ x, y });
+        } else {
+            console.log("Warn: No direction passed to move()");
+        }
+        if (this.debug)
+            console.log(
+                "After Move x,y,col,row: ",
+                this.x,
+                this.y,
+                this.col,
+                this.row
+            );
+    }
+    /// V V V ACTION PROTOTYPING V V V///////////////
+    // do(effect, args, entity = this) {
+    //     effect(entity, args);
+    // }
+    // getActionList() {
+    //     return this.actionList;
+    // }
+    // getAction(name) {
+    //     return this.actionList.find((item) => item.name === name);
+    // }
+    // addAction(action) {
+    //     //TODO:should probably check if it's already in list. if it is, add more of same?
+    //     this.actionList.push(action);
+    //     console.log("addAction is UNFINISHED");
+    // }
+    // removeAction(action) {
+    //     //should we be doing this by name or id? otherwise we have to deep-match objects?
+    //     console.log("REMOVE ACTION IS NOT IMPLEMENTED");
+    // }
     //we would have to call this create() function if we didnt add Player to the Factory
+    /// ^^^ ACTION PROTOTYPING ^^^///////////////
     // create() {
     // 3.2 add to scene
     // scene.add.existing(this);

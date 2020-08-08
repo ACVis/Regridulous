@@ -30,7 +30,7 @@ class ActionMoveLeft extends Action {
         super({ entity, cost });
     }
     do() {
-        this.entity.this.entity.currentAP -= this.cost;
+        this.entity.currentAP -= this.cost;
         this.entity.moveByGrid({ col: -1, row: 0 });
     }
 }

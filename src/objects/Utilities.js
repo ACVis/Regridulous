@@ -2,16 +2,16 @@ import { CST } from "./Constants";
 import { Random as RandomJs } from "random-js";
 // Should probably create tests. Also, tbh, these could probably be replaced by built in Phaser functionality
 function XYtoRC(x, y) {
-    const row = (CST.TILE_SIZE * CST.GRID_LENGTH) / y;
-    const col = (CST.TILE_SIZE * CST.GRID_WIDTH) / x;
+    const row = (CST.TILE_SIZE * (CST.GRID_LENGTH - 1)) / y;
+    const col = (CST.TILE_SIZE * (CST.GRID_WIDTH - 1)) / x;
     return [row, col];
 }
 function YtoRow(y) {
-    const row = (CST.TILE_SIZE * CST.GRID_LENGTH) / y;
+    const row = (CST.TILE_SIZE * (CST.GRID_LENGTH - 1)) / y;
     return row;
 }
-function XtoCol(y) {
-    const col = (CST.TILE_SIZE * CST.GRID_LENGTH) / y;
+function XtoCol(x) {
+    const col = (CST.TILE_SIZE * (CST.GRID_WIDTH - 1)) / x;
     return col;
 }
 function RCtoXY(row, col) {

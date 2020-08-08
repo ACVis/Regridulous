@@ -4,11 +4,13 @@
     "description": "",
     "main": "index.html",
     "scripts": {
-        "start": "parcel index.html --open",
-        "build": "parcel build index.html"
+        "dev": "parcel index.html --open",
+        "prod": "parcel build index.html"
     },
     "dependencies": {
         "phaser": "3.24.1",
+        "phaser-ce": "^2.10.3",
+        "phaser-ui-tools": "^2.0.0-beta",
         "random-js": "^2.1.0"
     },
     "devDependencies": {
