@@ -107,31 +107,73 @@ class mainScene {
         Inventory: managing shit
         Menu: of any kind. select shit or exit menu. cant move, etc.
         */
+        switch (state_) {
+            case STATE_DEFAULT:
+                if (input == PRESS_B) {
+                    state_ = STATE_JUMPING;
+                    yVelocity_ = JUMP_VELOCITY;
+                    setGraphics(IMAGE_JUMP);
+                } else if (input == PRESS_DOWN) {
+                    state_ = STATE_DUCKING;
+                    setGraphics(IMAGE_DUCK);
+                }
+                break;
 
-        this.input.keyboard.on("keyup-RIGHT", (event) => {
-            takeTurn();
-            this.player.x += CST.TILE_SIZE;
-            console.log(this.player.width, this.player.displayWidth);
+            case STATE_AIMING:
+                if (input == PRESS_DOWN) {
+                    state_ = STATE_DIVING;
+                    setGraphics(IMAGE_DIVE);
+                }
+                break;
 
-            console.log("right up!");
-        });
-        this.input.keyboard.on("keyup-DOWN", (event) => {
-            takeTurn();
-            this.player.y += CST.TILE_SIZE;
+            case STATE_MENU:
+                if (input == RELEASE_DOWN) {
+                    state_ = STATE_STANDING;
+                    setGraphics(IMAGE_STAND);
+                }
+                break;
+        }
+        function defaultState() {
+            this.input.keyboard.on("keyup-RIGHT", (event) => {
+                takeTurn();
+                this.player.x += CST.TILE_SIZE;
+                console.log(this.player.width, this.player.displayWidth);
 
-            console.log("down up!");
-        });
-        this.input.keyboard.on("keyup-LEFT", (event) => {
-            takeTurn();
-            this.player.x -= CST.TILE_SIZE;
-            console.log("right up!");
-        });
-        this.input.keyboard.on("keyup-UP", (event) => {
-            takeTurn();
-            this.player.y -= CST.TILE_SIZE;
+                console.log("right up!");
+            });
+            this.input.keyboard.on("keyup-DOWN", (event) => {
+                takeTurn();
+                this.player.y += CST.TILE_SIZE;
 
-            console.log("down up!");
-        });
+                console.log("down up!");
+            });
+            this.input.keyboard.on("keyup-LEFT", (event) => {
+                takeTurn();
+                this.player.x -= CST.TILE_SIZE;
+                console.log("right up!");
+            });
+            this.input.keyboard.on("keyup-UP", (event) => {
+                takeTurn();
+                this.player.y -= CST.TILE_SIZE;
+
+                console.log("down up!");
+            });
+            this.input.mouse.disableContextMenu();
+
+            this.input.on("pointerup", function (pointer) {
+                if (pointer.leftButtonReleased()) {
+                    console.log("Left Button was released");
+                } else if (pointer.rightButtonReleased()) {
+                    console.log("Right Button was released");
+                } else if (pointer.middleButtonReleased()) {
+                    console.log("Middle Button was released");
+                } else if (pointer.backButtonReleased()) {
+                    console.log("Back Button was released");
+                } else if (pointer.forwardButtonReleased()) {
+                    console.log("Forward Button was released");
+                }
+            });
+        }
 
         this.arrow = this.input.keyboard.createCursorKeys();
         console.log("Map Width: ", map.widthInPixels);
