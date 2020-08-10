@@ -42,6 +42,10 @@ class mainScene {
         //Set Player debug mode
         this.player.debug = true;
 
+        //Set default state for controls
+        this.controlState = "STATE_DEFAULT";
+
+        //Temp turn variables
         let actionsTillTurn = 2;
         let isTurn = false;
 
@@ -52,7 +56,135 @@ class mainScene {
             CST.TILE_SIZE,
             "UI OVER HERE"
         );
+
+        //NOTE:
         /*
+        Do statemachine for controls
+        Default: can move, can do spells, etc
+        Aiming (spells): can attempt to use spell (click on a square) or can cancel 
+        Inventory: managing shit
+        Menu: of any kind. select shit or exit menu. cant move, etc.
+        */
+
+        this.arrow = this.input.keyboard.createCursorKeys();
+        console.log("Map Width: ", map.widthInPixels);
+        console.log("Player X Y: ", this.player.x, this.player.y);
+        console.log("Player col row: ", this.player.col, this.player.row);
+
+        //Setup cameras
+        const camera = this.cameras.main;
+        this.cameras.main
+            // .setZoom(1.5)
+            .setBounds(0, 0, map.widthInPixels, map.heightInPixels)
+            // .centerOn(this.player.x, this.scale.y);
+            .startFollow(this.player);
+        // OR
+        // .centerToBounds()
+    }
+
+    update() {
+        // if the functions are creating the .on() type, then you're creating a new listener on every uipdate cycle
+        switch (this.controlState) {
+            case "STATE_DEFAULT":
+                this.defaultState();
+                break;
+
+            case "STATE_AIMING":
+                if (input == PRESS_DOWN) {
+                    state_ = STATE_DIVING;
+                    setGraphics(IMAGE_DIVE);
+                }
+                break;
+
+            case "STATE_MENU":
+                if (input == RELEASE_DOWN) {
+                    state_ = STATE_STANDING;
+                    setGraphics(IMAGE_STAND);
+                }
+                break;
+            default:
+                console.log("DEFAULT?");
+        }
+
+        // if (this.physics.overlap(this.player, this.coin)) {
+        //     this.hit();
+        // }
+        // if (this.arrow.right.isDown) {
+        //     this.player.x += 3;
+        //     console.log("DOWN!");
+        // } else if (this.arrow.left.isDown) {
+        //     this.player.x -= 3;
+        // }
+        // if (this.arrow.down.isDown) {
+        //     this.player.y += 3;
+        // } else if (this.arrow.up.isDown) {
+        //     this.player.y -= 3;
+        // }
+    }
+    defaultState() {
+        // this.input.keyboard.on("keyup-RIGHT", (event) => {
+        //     // this.takeTurn();
+        //     this.player.x += CST.TILE_SIZE;
+        //     console.log(this.player.width, this.player.displayWidth);
+
+        //     console.log("right up!");
+        // });
+        // this.input.keyboard.on("keyup-DOWN", (event) => {
+        //     // this.takeTurn();
+        //     this.player.y += CST.TILE_SIZE;
+
+        //     console.log("down up!");
+        // });
+        // this.input.keyboard.on("keyup-LEFT", (event) => {
+        //     // this.takeTurn();
+        //     this.player.x -= CST.TILE_SIZE;
+        //     console.log("right up!");
+        // });
+        // this.input.keyboard.on("keyup-UP", (event) => {
+        //     // this.takeTurn();
+        //     this.player.y -= CST.TILE_SIZE;
+
+        //     console.log("down up!");
+        // });
+        if (this.arrow.up.isDown) {
+            // this.takeTurn();
+            this.player.x += CST.TILE_SIZE;
+            console.log(this.player.width, this.player.displayWidth);
+
+            console.log("right up!");
+        } else if (this.arrow.down.isDown) {
+            // this.takeTurn();
+            this.player.y += CST.TILE_SIZE;
+
+            console.log("down up!");
+        } else if (this.arrow.left.isDown) {
+            // this.takeTurn();
+            this.player.x -= CST.TILE_SIZE;
+            console.log("right up!");
+        } else if (this.arrow.up.isDown) {
+            // this.takeTurn();
+            this.player.y -= CST.TILE_SIZE;
+
+            console.log("down up!");
+        }
+
+        this.input.mouse.disableContextMenu();
+
+        // this.input.on("pointerup", function (pointer) {
+        //     if (pointer.leftButtonReleased()) {
+        //         console.log("Left Button was released");
+        //     } else if (pointer.rightButtonReleased()) {
+        //         console.log("Right Button was released");
+        //     } else if (pointer.middleButtonReleased()) {
+        //         console.log("Middle Button was released");
+        //     } else if (pointer.backButtonReleased()) {
+        //         console.log("Back Button was released");
+        //     } else if (pointer.forwardButtonReleased()) {
+        //         console.log("Forward Button was released");
+        //     }
+        // });
+    }
+    /*
             //Stat Type
             {
                 Health: 100
@@ -80,110 +212,42 @@ class mainScene {
             }
         */
 
-        // How does initiative work
-        // Enemy turn order is decided like this:
-        // If multiple enemies tie on the number/stat, then they move to the next tie breaker
-        // 1. Initiative base stat
-        // 2. Distance to player
-        // 3. Random roll tie breaker
+    // How does initiative work
+    // Enemy turn order is decided like this:
+    // If multiple enemies tie on the number/stat, then they move to the next tie breaker
+    // 1. Initiative base stat
+    // 2. Distance to player
+    // 3. Random roll tie breaker
 
-        // If this doesn't work, consider making it totally random?
-        function takeTurn() {
-            // player actions
-            // enemy actions
-            // map moves
+    // If this doesn't work, consider making it totally random?
+    takeTurn() {
+        // player actions
+        // enemy actions
+        // map moves
 
-            //PLAYER
-            //reset/set AP
-            //spend AP or bank AP/pass
-            // Actions
-            //Move
-            //Check collision
-            //Effect
-            //Use item, spell, attack
-            // Bank
-            // Add remaining AP to bank, no more than max
-            //ENEMY
+        //PLAYER
+        //reset/set AP
+        //spend AP or bank AP/pass
+        // Actions
+        //Move
+        //Check collision
+        //Effect
+        //Use item, spell, attack
+        // Bank
+        // Add remaining AP to bank, no more than max
+        //ENEMY
 
-            //is this a turn?
+        //is this a turn?
 
-            if (actionsTillTurn <= 0) {
-                isTurn = true;
-            }
-
-            if (isTurn) {
-                //enemies
-            }
+        if (actionsTillTurn <= 0) {
+            isTurn = true;
         }
-        //NOTE:
-        /*
-        Do statemachine for controls
-        Default: can move, can do spells, etc
-        Aiming (spells): can attempt to use spell (click on a square) or can cancel 
-        Inventory: managing shit
-        Menu: of any kind. select shit or exit menu. cant move, etc.
-        */
-        // const movePlayer = this.player.getAction("move");
-        // movePlayer(this.player, { row: 1 });
 
-        this.input.keyboard.on("keyup-RIGHT", (event) => {
-            if (this.debug) console.log("right up!");
-
-            // takeTurn();
-            // this.player.x += CST.TILE_SIZE;
-            // console.log(this.player.width, this.player.displayWidth);
-            this.player.moveEnt({ cols: 1 });
-        });
-        this.input.keyboard.on("keyup-DOWN", (event) => {
-            if (this.debug) console.log("down up!");
-            // takeTurn();
-            // this.player.y += CST.TILE_SIZE;
-            this.player.moveEnt({ rows: 1 });
-        });
-        this.input.keyboard.on("keyup-LEFT", (event) => {
-            if (this.debug) console.log("right up!");
-            // takeTurn();
-            // this.player.x -= CST.TILE_SIZE;
-            this.player.moveEnt({ cols: -1 });
-        });
-        this.input.keyboard.on("keyup-UP", (event) => {
-            if (this.debug) console.log("down up!");
-            // takeTurn();
-            // this.player.y -= CST.TILE_SIZE;
-            this.player.moveEnt({ rows: -1 });
-        });
-
-        this.arrow = this.input.keyboard.createCursorKeys();
-        console.log("Map Width: ", map.widthInPixels);
-        console.log("Player X Y: ", this.player.x, this.player.y);
-        console.log("Player col row: ", this.player.col, this.player.row);
-
-        const camera = this.cameras.main;
-        this.cameras.main
-            // .setZoom(1.5)
-            .setBounds(0, 0, map.widthInPixels, map.heightInPixels)
-            // .centerOn(this.player.x, this.scale.y);
-            .startFollow(this.player);
-        // OR
-        // .centerToBounds()
-    }
-
-    update() {
-        // if (this.physics.overlap(this.player, this.coin)) {
-        //     this.hit();
-        // }
-        // if (this.arrow.right.isDown) {
-        //     this.player.x += 3;
-        //     console.log("DOWN!");
-        // } else if (this.arrow.left.isDown) {
-        //     this.player.x -= 3;
-        // }
-        // if (this.arrow.down.isDown) {
-        //     this.player.y += 3;
-        // } else if (this.arrow.up.isDown) {
-        //     this.player.y -= 3;
-        // }
+        if (isTurn) {
+            //enemies
+        }
     }
 }
+
 // export { mainScene };
 new Phaser.Game(Object.assign(CST.CONFIGS.config4, { scene: mainScene }));
