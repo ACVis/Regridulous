@@ -1,7 +1,7 @@
 import Phaser from "phaser";
 import { Entity } from "./Entity";
 import { CST } from "./Constants";
-import { action_Move } from "./Actions";
+// import { action_Move } from "./Actions";
 const statMixin = {
     Health: 100,
     Defense: 10,
@@ -72,12 +72,12 @@ class Player extends Entity {
     }
 
     handleInput(input) {
-        // const state = this.state.handleInput(input);
+        const state = this.state.handleInput(input);
 
-        // if (state != null) {
-        //   this.state = state;
-        //   this.state.enter(this);
-        // }
+        if (state != null) {
+            this.state = state;
+            this.state.enter(this);
+        }
 
         this.state.handleInput(input);
         // this.equipment.handleInput(input);
@@ -180,7 +180,9 @@ class StandingState extends PlayerState {
     }
 }
 class DefaultState extends PlayerState {
-    constructor() {}
+    constructor() {
+        super();
+    }
 
     handleInput(player, input) {
         if (input == PRESS_B) {
