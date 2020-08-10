@@ -67,14 +67,29 @@ class Player extends Entity {
     constructor(scene, x, y, textureName = CST.IMGS.KEYS.PLAYER, frame) {
         super(scene, x, y, textureName);
         // this.addAction(action_Move);
+        this.state = new DefaultState();
+        // this.equipment = new Gun();
+    }
+
+    handleInput(input) {
+        // const state = this.state.handleInput(input);
+
+        // if (state != null) {
+        //   this.state = state;
+        //   this.state.enter(this);
+        // }
+
+        this.state.handleInput(input);
+        // this.equipment.handleInput(input);
+    }
+
+    update() {
+        this.state.update(this);
     }
     //we would have to call this create() function if we didnt add Player to the Factory
     create() {
         // 3.2 add to scene
         // scene.add.existing(this);
-    }
-    update() {
-        //take turn
     }
     // spawn(){}
     // despawn(){} //destroy the enemy or deactivate
@@ -96,3 +111,104 @@ Phaser.GameObjects.GameObjectFactory.register(CST.IMGS.KEYS.PLAYER, function (
 
     return player;
 });
+
+class PlayerState {
+    constructor() {}
+
+    handleInput(player, input) {
+        if (input == PRESS_DOWN) {
+            return new DuckingState();
+        }
+
+        return null;
+    }
+
+    update(player) {}
+
+    static standing = "standing";
+    static ducking = "ducking";
+    static jumping = "jumping";
+    static diving = "diving";
+}
+
+class OnGroundState extends PlayerState {
+    static handleInput(player, input) {
+        if (input == PRESS_B) {
+            //jump
+        } else if (input == PRESS_DOWN) {
+            // duck
+        }
+    }
+}
+
+class DuckingState extends OnGroundState {
+    constructor() {
+        this.chargeTime = 0;
+    }
+
+    handleInput(player, input) {
+        if (input == RELEASE_DOWN) {
+            return new StandingState();
+        } else {
+            OnGroundState.handleInput(player, input);
+        }
+    }
+
+    update(player) {
+        this.chargeTime += 1;
+        if (this.chargeTime > MAX_CHARGE) {
+            player.superBomb();
+        }
+    }
+}
+
+class StandingState extends PlayerState {
+    constructor() {}
+
+    handleInput(player, input) {
+        if (input == PRESS_B) {
+            player.state = PlayerState.jumping;
+        }
+    }
+
+    update(player) {
+        this.velocityY = JUMP_VELOCITY;
+    }
+
+    enter(player) {
+        player.setGraphics(IMAGE_JUMP);
+    }
+}
+class DefaultState extends PlayerState {
+    constructor() {}
+
+    handleInput(player, input) {
+        if (input == PRESS_B) {
+            player.state = PlayerState.jumping;
+        }
+    }
+
+    update(player) {
+        this.velocityY = JUMP_VELOCITY;
+    }
+
+    // enter(player) {
+    //     player.setGraphics(IMAGE_JUMP);
+    // }
+}
+
+class JumpingState {
+    constructor(player) {
+        // apply initial up velocity to player
+    }
+
+    handleInput(player, input) {}
+
+    update(player) {
+        if (player.isOnGround()) {
+            return new StandingState();
+        } else {
+            player.applyForce(GRAVITY);
+        }
+    }
+}
