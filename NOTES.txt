@@ -1,2 +1,6 @@
 row tools/system is backwards. row "1" is actually the last row. need to convert soemwhere
 Use the phaser-ui scrollable container for spell list
+
+Revelation?
+I don't think I need a FSM on player itself for CONTROLS. The state of the controls belongs to the game or scene. 
+Mouse clicks are going to be changing some state of UI/Game (are we ina menu and can player/entities do anything while we're in this menu(no)), then this UI fires off some player event.
