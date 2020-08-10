@@ -30,9 +30,9 @@ class mainScene {
         if (this.debug) console.log(MAP.getTileArray());
 
         //Create Enemies
-        // const ENEMIES = new EnemyManager(this, MAP.getTileArray());
+        const ENEMIES = new EnemyManager(this, MAP.getTileArray());
         //This adds enemies as sprites for now
-        // ENEMIES.addEnemies(MAP.getTileArray());
+        ENEMIES.addEnemies(MAP.getTileArray());
 
         //Create Player
         const gridHalf = Math.floor(CST.GRID_WIDTH / 2);
