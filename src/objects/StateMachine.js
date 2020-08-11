@@ -1,4 +1,4 @@
-class StateMachine {
+class StateMachinev1 {
     constructor(initialState, possibleStates, stateArgs = []) {
         this.initialState = initialState;
         this.possibleStates = possibleStates;
@@ -47,63 +47,80 @@ class StateMachine {
         this.possibleStates[this.state].enter(...this.stateArgs, ...enterArgs);
     }
 }
-class StateMachinev2 {
-    constructor(initialState, stateList, { scene, subject } = {}) {
-        this.initialState = initialState;
-        this.possibleStates;
-        this.stateArgs = stateArgs;
-        this.state = null;
 
-        for (const state of Object.values(this.stateList)) {
-            this.possibleStates[state] = state(scene, subject);
-        }
-        // State instances get access to the state machine via this.stateMachine.
-        for (const state of Object.values(this.stateList)) {
-            state.stateMachine = this;
-        }
+class StateMachine {
+    constructor(initialState, stateList, { scene, subject } = {}) {
+        this.scene = scene;
+        this.subject = subject;
+        this.state = this.newState(initialState);
+        // this.stateArgs = stateArgs;
+
+        // for (const state of Object.values(stateList)) {
+        //     state.scene = scene;
+        //     state.subject = subject;
+        //     // State instances get access to the state machine via this.stateMachine.
+        //     state.stateMachine = this;
+        // }
     }
-    //handleInput can optionally return a state to switch to
-    handleInput(scene, subject, input) {
-        console.log("StateMachine handle input placeholder, passing: ", input);
+    newState(stateClass, optional = null) {
+        const { scene, subject } = this;
+        const state = new stateClass({
+            scene,
+            subject,
+            stateMachine: this,
+            optional,
+        });
+        return state;
+    }
+    handleInput(input) {
+        console.log(
+            "StateMachine handle input. Class: ",
+            Object.getPrototypeOf(this.state).constructor.name,
+            " Input: ",
+            input
+        );
         const state = this.state.handleInput(input);
 
+        //handleInput can optionally return a state to switch to
         if (state != null) {
             this.state = state;
-            this.possibleStates[this.state].enter(...this.stateArgs);
+            this.state.enter(input);
         }
 
-        this.state.handleInput(input);
+        // this.state.handleInput(input);
         // this.equipment.handleInput(input);
     }
     update() {
         // On the first step, the state is null and we need to initialize the first state.
         if (this.state === null) {
-            this.state = this.initialState;
-            this.possibleStates[this.state].enter(...this.stateArgs);
+            this.state = this.newState(this.initialState);
+            this.state.enter();
         }
 
         // Run the current state's execute
-        this.possibleStates[this.state].update(...this.stateArgs);
+        this.state.update();
     }
-
-    transition(newState, ...enterArgs) {
-        this.state = newState;
-        this.possibleStates[this.state].enter(...this.stateArgs, ...enterArgs);
-    }
+    // I think transition is replaced by just passing instantiated States from some CONST list
+    // transition(newState, ...enterArgs) {
+    //     this.state = newState;
+    //     this.state.enter(...this.stateArgs, ...enterArgs);
+    // }
 }
 
-class Statev2 {
-    //Put this constructor on the child classes
-    // constructor(scene, subject) {
-    //     this.scene = scene;
-    //     this.subject = subject;
-    // }
+class State {
+    //Put this constructor only the child classes?
+    constructor({ scene, subject, stateMachine, optional }) {
+        this.scene = scene;
+        this.subject = subject;
+        this.stateMachine = stateMachine;
+        this.transition = stateMachine.newState;
+    }
     enter() {}
+    exit() {}
     handleInput() {}
     update() {}
-    exit() {}
 }
-class State {
+class Statev1 {
     enter() {}
     handleInput() {}
     update() {}
