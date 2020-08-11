@@ -9,8 +9,23 @@ However, the ControlsState will pass controls to the appropriate sub-state handl
 controls. As soon as ControlsState == Menu, Player no longer gets input. 
 
 Difference between handleInput and update is that handleInput is ONLY called on input and update is called EVERY frame.
+///////////
+GIT Merge/Rebase
+///////////
 
+git commit -a -m "current working changes"
+git checkout master
+git pull
+git checkout working-branch
+git rebase master
+...
+git commit -a -m "final working changes"
+git checkout master
+git merge working-branch
+
+///////////
 RANDOM
+///////////
 
     /*
             //Stat Type
@@ -75,3 +90,5 @@ RANDOM
             //enemies
         }
     }
+
+    
