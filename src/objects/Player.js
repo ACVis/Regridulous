@@ -1,6 +1,7 @@
 import Phaser from "phaser";
 import { Entity } from "./Entity";
 import { CST } from "./Constants";
+import { StateMachine, State } from "./StateMachine";
 // import { action_Move } from "./Actions";
 const statMixin = {
     Health: 100,
@@ -63,12 +64,57 @@ const basic = {
 //         // scene.sys.displayList.add(this);
 //     }
 // }
+
+class DefaultState extends State {
+    // constructor() {
+    //     super();
+    // }
+
+    handleInput(player, input) {
+        if (input == "ArrowRight") {
+            // this.takeTurn();
+            this.player.x += CST.TILE_SIZE;
+            console.log(this.player.width, this.player.displayWidth);
+
+            console.log("right up!");
+        } else if (input == "ArrowDown") {
+            // this.takeTurn();
+            this.player.y += CST.TILE_SIZE;
+
+            console.log("down up!");
+        } else if (input == "ArrowUp") {
+            // this.takeTurn();
+            this.player.x -= CST.TILE_SIZE;
+            console.log("right up!");
+        } else if (input == "ArrowDown") {
+            // this.takeTurn();
+            this.player.y -= CST.TILE_SIZE;
+
+            console.log("down up!");
+        }
+    }
+
+    update(player) {
+        // this.velocityY = JUMP_VELOCITY;
+    }
+
+    // enter(player) {
+    //     player.setGraphics(IMAGE_JUMP);
+    // }
+}
+
 class Player extends Entity {
     constructor(scene, x, y, textureName = CST.IMGS.KEYS.PLAYER, frame) {
         super(scene, x, y, textureName);
         // this.addAction(action_Move);
-        this.state = new DefaultState();
+        // this.state = new DefaultState();
         // this.equipment = new Gun();
+        this.scene = scene;
+        this.state = new StateMachine(
+            "default",
+            { default: new DefaultState() },
+            [scene, this.player]
+        );
     }
 
     handleInput(input) {
@@ -84,7 +130,7 @@ class Player extends Entity {
     }
 
     update() {
-        this.state.update(this);
+        this.state.update(this.scene, this);
     }
     //we would have to call this create() function if we didnt add Player to the Factory
     create() {
@@ -130,87 +176,71 @@ class PlayerState {
     static jumping = "jumping";
     static diving = "diving";
 }
+////////////////////////////////////////////
+// Old Example States
+////////////////////////////////////////////
+// class OnGroundState extends PlayerState {
+//     static handleInput(player, input) {
+//         if (input == PRESS_B) {
+//             //jump
+//         } else if (input == PRESS_DOWN) {
+//             // duck
+//         }
+//     }
+// }
 
-class OnGroundState extends PlayerState {
-    static handleInput(player, input) {
-        if (input == PRESS_B) {
-            //jump
-        } else if (input == PRESS_DOWN) {
-            // duck
-        }
-    }
-}
+// class DuckingState extends OnGroundState {
+//     constructor() {
+//         this.chargeTime = 0;
+//     }
 
-class DuckingState extends OnGroundState {
-    constructor() {
-        this.chargeTime = 0;
-    }
+//     handleInput(player, input) {
+//         if (input == RELEASE_DOWN) {
+//             return new StandingState();
+//         } else {
+//             OnGroundState.handleInput(player, input);
+//         }
+//     }
 
-    handleInput(player, input) {
-        if (input == RELEASE_DOWN) {
-            return new StandingState();
-        } else {
-            OnGroundState.handleInput(player, input);
-        }
-    }
+//     update(player) {
+//         this.chargeTime += 1;
+//         if (this.chargeTime > MAX_CHARGE) {
+//             player.superBomb();
+//         }
+//     }
+// }
+// class StandingState extends PlayerState {
+//     constructor() {}
 
-    update(player) {
-        this.chargeTime += 1;
-        if (this.chargeTime > MAX_CHARGE) {
-            player.superBomb();
-        }
-    }
-}
+//     handleInput(player, input) {
+//         if (input == PRESS_B) {
+//             player.state = PlayerState.jumping;
+//         }
+//     }
 
-class StandingState extends PlayerState {
-    constructor() {}
+//     update(player) {
+//         this.velocityY = JUMP_VELOCITY;
+//     }
 
-    handleInput(player, input) {
-        if (input == PRESS_B) {
-            player.state = PlayerState.jumping;
-        }
-    }
+//     enter(player) {
+//         player.setGraphics(IMAGE_JUMP);
+//     }
+// }
+// class JumpingState {
+//     constructor(player) {
+//         // apply initial up velocity to player
+//     }
 
-    update(player) {
-        this.velocityY = JUMP_VELOCITY;
-    }
+//     handleInput(player, input) {}
 
-    enter(player) {
-        player.setGraphics(IMAGE_JUMP);
-    }
-}
-class DefaultState extends PlayerState {
-    constructor() {
-        super();
-    }
-
-    handleInput(player, input) {
-        if (input == PRESS_B) {
-            player.state = PlayerState.jumping;
-        }
-    }
-
-    update(player) {
-        this.velocityY = JUMP_VELOCITY;
-    }
-
-    // enter(player) {
-    //     player.setGraphics(IMAGE_JUMP);
-    // }
-}
-
-class JumpingState {
-    constructor(player) {
-        // apply initial up velocity to player
-    }
-
-    handleInput(player, input) {}
-
-    update(player) {
-        if (player.isOnGround()) {
-            return new StandingState();
-        } else {
-            player.applyForce(GRAVITY);
-        }
-    }
-}
+//     update(player) {
+//         if (player.isOnGround()) {
+//             return new StandingState();
+//         } else {
+//             player.applyForce(GRAVITY);
+//         }
+//     }
+// }
+////////////////////////////////////////////
+// Old Example States
+////////////////////////////////////////////
