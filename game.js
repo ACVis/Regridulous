@@ -5,72 +5,61 @@ import { Player } from "./src/objects/Player";
 import { MapManager } from "./src/objects/Map";
 import { EnemyManager } from "./src/objects/Enemies";
 import { Utils, Random } from "./src/objects/Utilities";
+import { StateMachine, State } from "./src/objects/StateMachine";
 import images from "./assets/*.png";
 import tileset from "./assets/tileset/*.png";
 import { TextSprite } from "phaser-ui-tools";
 
-class State {
-    name = "DefaultState";
-    constructor({ debug = false } = {}) {
-        this.debug = debug;
-    }
+// class State {
+//     name = "DefaultState";
+//     constructor({ debug = false } = {}) {
+//         this.debug = debug;
+//     }
 
-    handleInput(subject, input) {}
+//     handleInput(subject, input) {}
 
-    update(subject) {}
+//     update(subject) {}
 
-    enter(subject) {
-        if (this.debug) {
-            console.log("Entered " + this.name ? this.name : "Unnamed State");
-        }
-    }
-    exit() {}
-}
+//     enter(subject) {
+//         if (this.debug) {
+//             console.log("Entered " + this.name ? this.name : "Unnamed State");
+//         }
+//     }
+//     exit() {}
+// }
 
 class DefaultState extends State {
-    handleInput(keyevent) {
-        this.player.handleInput(keyevent);
-        // console.log("this in handleInput", this);
-        // const { code } = keyevent;
-
-        // if (code === "ArrowRight") {
-        //     // this.takeTurn();
-        //     this.player.x += CST.TILE_SIZE;
-        //     console.log(this.player.width, this.player.displayWidth);
-
-        //     console.log("right up!");
-        // } else if (code === "ArrowDown") {
-        //     // this.takeTurn();
-        //     this.player.y += CST.TILE_SIZE;
-
-        //     console.log("down up!");
-        // } else if (code === "ArrowLeft") {
-        //     // this.takeTurn();
-        //     this.player.x -= CST.TILE_SIZE;
-        //     console.log("right up!");
-        // } else if (code === "ArrowUp") {
-        //     // this.takeTurn();
-        //     this.player.y -= CST.TILE_SIZE;
-
-        //     console.log("down up!");
-        // }
+    handleInput(scene, player, keyevent) {
+        player.handleInput(keyevent);
+    }
+    update(scene, player) {
+        player.update();
     }
 }
+class InventoryState extends State {
+    handleInput(keyevent) {}
+    update() {}
+}
+class MenuState extends State {
+    handleInput(keyevent) {}
+    update() {}
+}
+// const STATE_KEYS = {
+//     default: {
+//         key: "default",
+//         state: DefaultState,
+//     },
+//     inventory: {
+//         key: "inventory",
+//         state: InventoryState,
+//     },
+//     menu: {
+//         key: "menu",
+//         state: MenuState,
+//     },
+// };
+
 class mainScene {
-    constructor() {
-        this.state = new DefaultState();
-    }
-    handleInput(input) {
-        const state = this.state.handleInput(input);
-
-        if (state != null) {
-            this.state = state;
-            this.state.enter(this);
-        }
-
-        this.state.handleInput(input);
-        // this.equipment.handleInput(input);
-    }
     preload() {
         this.load.image("player", images.player);
         this.load.image("enemy_basic", images.enemy_basic);
@@ -104,16 +93,39 @@ class mainScene {
         this.player.debug = true;
 
         //Set default state for controls
-        this.controlState = "STATE_DEFAULT";
+        this.ControlState = new StateMachine(
+            "default",
+            {
+                default: new DefaultState(),
+                inventory: new InventoryState(),
+                menu: new MenuState(),
+            },
+            [this, this.player]
+        );
+
+        //Could probably provide accessor functions, getters on actual player class and contain the statemachine there
+        // this.PlayerState = new StateMachine("", {}, [this, this.player]);
 
         this.input.keyboard.on("keyup", (event) => {
             console.dir(event);
-            this.handleInput(event);
+            this.ControlState.handleInput(event);
         });
-
-        //Temp turn variables
-        let actionsTillTurn = 2;
-        let isTurn = false;
+        this.input.on("pointerup", (pointer) => {
+            if (this.debug) console.log("Pointer Event: ", pointer);
+            this.ControlState.handleInput(pointer);
+            //     if (pointer.leftButtonReleased()) {
+            //         console.log("Left Button was released");
+            //     } else if (pointer.rightButtonReleased()) {
+            //         console.log("Right Button was released");
+            //     } else if (pointer.middleButtonReleased()) {
+            //         console.log("Middle Button was released");
+            //     } else if (pointer.backButtonReleased()) {
+            //         console.log("Back Button was released");
+            //     } else if (pointer.forwardButtonReleased()) {
+            //         console.log("Forward Button was released");
+            //     }
+        });
+        // Handle Turns/Actions?
 
         //Create UI
 
@@ -133,9 +145,11 @@ class mainScene {
         */
 
         this.arrow = this.input.keyboard.createCursorKeys();
-        console.log("Map Width: ", map.widthInPixels);
-        console.log("Player X Y: ", this.player.x, this.player.y);
-        console.log("Player col row: ", this.player.col, this.player.row);
+        if (this.debug) console.log("Map Width: ", map.widthInPixels);
+        if (this.debug)
+            console.log("Player X Y: ", this.player.x, this.player.y);
+        if (this.debug)
+            console.log("Player col row: ", this.player.col, this.player.row);
 
         //Setup cameras
         const camera = this.cameras.main;
@@ -149,80 +163,7 @@ class mainScene {
     }
 
     update() {
-        this.state.update(this);
-        // if the functions are creating the .on() type, then you're creating a new listener on every uipdate cycle
-        // switch (this.controlState) {
-        //     case "STATE_DEFAULT":
-        //         this.defaultState();
-        //         break;
-        //     case "STATE_AIMING":
-        //         if (input == PRESS_DOWN) {
-        //             state_ = STATE_DIVING;
-        //             setGraphics(IMAGE_DIVE);
-        //         }
-        //         break;
-        //     case "STATE_MENU":
-        //         if (input == RELEASE_DOWN) {
-        //             state_ = STATE_STANDING;
-        //             setGraphics(IMAGE_STAND);
-        //         }
-        //         break;
-        //     default:
-        //         console.log("DEFAULT?");
-        // }
-        // if (this.physics.overlap(this.player, this.coin)) {
-        //     this.hit();
-        // }
-        // if (this.arrow.right.isDown) {
-        //     this.player.x += 3;
-        //     console.log("DOWN!");
-        // } else if (this.arrow.left.isDown) {
-        //     this.player.x -= 3;
-        // }
-        // if (this.arrow.down.isDown) {
-        //     this.player.y += 3;
-        // } else if (this.arrow.up.isDown) {
-        //     this.player.y -= 3;
-        // }
-    }
-    defaultState() {
-        if (this.arrow.up.isDown) {
-            // this.takeTurn();
-            this.player.x += CST.TILE_SIZE;
-            console.log(this.player.width, this.player.displayWidth);
-
-            console.log("right up!");
-        } else if (this.arrow.down.isDown) {
-            // this.takeTurn();
-            this.player.y += CST.TILE_SIZE;
-
-            console.log("down up!");
-        } else if (this.arrow.left.isDown) {
-            // this.takeTurn();
-            this.player.x -= CST.TILE_SIZE;
-            console.log("right up!");
-        } else if (this.arrow.up.isDown) {
-            // this.takeTurn();
-            this.player.y -= CST.TILE_SIZE;
-
-            console.log("down up!");
-        }
-
-        this.input.mouse.disableContextMenu();
-
-        // this.input.on("pointerup", function (pointer) {
-        //     if (pointer.leftButtonReleased()) {
-        //         console.log("Left Button was released");
-        //     } else if (pointer.rightButtonReleased()) {
-        //         console.log("Right Button was released");
-        //     } else if (pointer.middleButtonReleased()) {
-        //         console.log("Middle Button was released");
-        //     } else if (pointer.backButtonReleased()) {
-        //         console.log("Back Button was released");
-        //     } else if (pointer.forwardButtonReleased()) {
-        //         console.log("Forward Button was released");
-        //     }
-        // });
+        this.ControlState.update();
     }
 }
 
