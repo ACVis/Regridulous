@@ -11,7 +11,7 @@ import tileset from "./assets/tileset/*.png";
 import { TextSprite } from "phaser-ui-tools";
 
 // class State {
-//     name = "DefaultState";
+//     name = "DefaultControlState";
 //     constructor({ debug = false } = {}) {
 //         this.debug = debug;
 //     }
@@ -28,36 +28,34 @@ import { TextSprite } from "phaser-ui-tools";
 //     exit() {}
 // }
 
-class DefaultState extends State {
-    handleInput(scene, player, keyevent) {
-        player.handleInput(keyevent);
+class DefaultControlState extends State {
+    constructor(config) {
+        super(config);
     }
-    update(scene, player) {
-        player.update();
+    handleInput = (keyevent) => {
+        this.subject.handleInput(keyevent);
+
+        if ("activates menu somehow") {
+            this.transition(STATE_LIST.menu);
+        }
+    };
+    update() {
+        this.subject.update();
     }
 }
-class InventoryState extends State {
+class InventoryControlState extends State {
     handleInput(keyevent) {}
     update() {}
 }
-class MenuState extends State {
+class MenuControlState extends State {
     handleInput(keyevent) {}
     update() {}
 }
-// const STATE_KEYS = {
-//     default: {
-//         key: "default",
-//         state: DefaultState,
-//     },
-//     inventory: {
-//         key: "inventory",
-//         state: InventoryState,
-//     },
-//     menu: {
-//         key: "menu",
-//         state: MenuState,
-//     },
-// };
+const STATE_LIST = {
+    default: DefaultControlState,
+    inventory: InventoryControlState,
+    menu: MenuControlState,
+};
 
 class mainScene {
     preload() {
@@ -93,15 +91,10 @@ class mainScene {
         this.player.debug = true;
 
         //Set default state for controls
-        this.ControlState = new StateMachine(
-            "default",
-            {
-                default: new DefaultState(),
-                inventory: new InventoryState(),
-                menu: new MenuState(),
-            },
-            [this, this.player]
-        );
+        this.ControlState = new StateMachine(STATE_LIST.default, STATE_LIST, {
+            scene: this,
+            subject: this.player,
+        });
 
         //Could probably provide accessor functions, getters on actual player class and contain the statemachine there
         // this.PlayerState = new StateMachine("", {}, [this, this.player]);

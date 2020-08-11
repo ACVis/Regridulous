@@ -66,33 +66,33 @@ const basic = {
 // }
 
 class DefaultState extends State {
-    // constructor() {
-    //     super();
-    // }
+    constructor(config) {
+        super(config);
+    }
 
-    handleInput(player, input) {
-        if (input == "ArrowRight") {
+    handleInput = (input) => {
+        if (input.code == "ArrowRight") {
             // this.takeTurn();
-            this.player.x += CST.TILE_SIZE;
-            console.log(this.player.width, this.player.displayWidth);
+            this.subject.x += CST.TILE_SIZE;
+            console.log(this.subject.width, this.subject.displayWidth);
 
             console.log("right up!");
-        } else if (input == "ArrowDown") {
+        } else if (input.code == "ArrowDown") {
             // this.takeTurn();
-            this.player.y += CST.TILE_SIZE;
+            this.subject.y += CST.TILE_SIZE;
 
-            console.log("down up!");
-        } else if (input == "ArrowUp") {
+            console.log("down down!");
+        } else if (input.code == "ArrowLeft") {
             // this.takeTurn();
-            this.player.x -= CST.TILE_SIZE;
+            this.subject.x -= CST.TILE_SIZE;
             console.log("right up!");
-        } else if (input == "ArrowDown") {
+        } else if (input.code == "ArrowUp") {
             // this.takeTurn();
-            this.player.y -= CST.TILE_SIZE;
+            this.subject.y -= CST.TILE_SIZE;
 
             console.log("down up!");
         }
-    }
+    };
 
     update(player) {
         // this.velocityY = JUMP_VELOCITY;
@@ -102,7 +102,9 @@ class DefaultState extends State {
     //     player.setGraphics(IMAGE_JUMP);
     // }
 }
-
+const STATE_LIST = {
+    default: DefaultState,
+};
 class Player extends Entity {
     constructor(scene, x, y, textureName = CST.IMGS.KEYS.PLAYER, frame) {
         super(scene, x, y, textureName);
@@ -110,27 +112,18 @@ class Player extends Entity {
         // this.state = new DefaultState();
         // this.equipment = new Gun();
         this.scene = scene;
-        this.state = new StateMachine(
-            "default",
-            { default: new DefaultState() },
-            [scene, this.player]
-        );
+        this.state = new StateMachine(STATE_LIST.default, STATE_LIST, {
+            scene,
+            subject: this,
+        });
     }
 
     handleInput(input) {
-        const state = this.state.handleInput(input);
-
-        if (state != null) {
-            this.state = state;
-            this.state.enter(this);
-        }
-
         this.state.handleInput(input);
-        // this.equipment.handleInput(input);
     }
 
     update() {
-        this.state.update(this.scene, this);
+        this.state.update();
     }
     //we would have to call this create() function if we didnt add Player to the Factory
     create() {
