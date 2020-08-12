@@ -2,6 +2,7 @@ import Phaser from "phaser";
 import { Entity } from "./Entity";
 import { CST } from "./Constants";
 import { StateMachine, State } from "./StateMachine";
+import { Utils } from "./Utilities";
 // import { action_Move } from "./Actions";
 const statMixin = {
     Health: 100,
@@ -71,6 +72,16 @@ class DefaultState extends State {
     }
 
     handleInput = (input) => {
+        let newPositionX = this.subject.x + CST.TILE_SIZE;
+        let rightTile = this.scene.map.getTileAtWorldXY(
+            this.subject.x + CST.TILE_SIZE,
+            this.subject.y,
+            false,
+            this.scene.cameras.main
+        );
+        console.log("Player rc", rightTile.x, rightTile.y);
+        console.log(this.scene.map, rightTile);
+        rightTile.setAlpha(0.2);
         if (input.code == "ArrowRight") {
             // this.takeTurn();
             this.subject.x += CST.TILE_SIZE;

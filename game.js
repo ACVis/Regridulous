@@ -73,7 +73,8 @@ class mainScene {
         let MAP = new MapManager(this);
         MAP.generateMap(CST.GRID_WIDTH, CST.GRID_LENGTH);
         const [map, layer] = MAP.createMap("overworld-tiles");
-
+        this.map = map;
+        this.mapLayer = layer;
         if (this.debug) console.log(MAP.getMap());
         if (this.debug) console.log(MAP.getTileArray());
 
