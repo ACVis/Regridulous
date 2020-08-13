@@ -72,10 +72,33 @@ class DefaultState extends State {
     }
 
     handleInput = (input) => {
-        let newPositionX = this.subject.x + CST.TILE_SIZE;
+        const { x, y } = this.subject;
+        let nextRight = x + CST.TILE_SIZE;
+        let nextLeft = x - CST.TILE_SIZE;
+        let nextUp = y - CST.TILE_SIZE;
+        let nextDown = y + CST.TILE_SIZE;
+
         let rightTile = this.scene.map.getTileAtWorldXY(
-            this.subject.x + CST.TILE_SIZE,
-            this.subject.y,
+            nextRight,
+            y,
+            false,
+            this.scene.cameras.main
+        );
+        let leftTile = this.scene.map.getTileAtWorldXY(
+            nextLeft,
+            y,
+            false,
+            this.scene.cameras.main
+        );
+        let upTile = this.scene.map.getTileAtWorldXY(
+            x,
+            nextUp,
+            false,
+            this.scene.cameras.main
+        );
+        let downTile = this.scene.map.getTileAtWorldXY(
+            x,
+            nextDown,
             false,
             this.scene.cameras.main
         );
