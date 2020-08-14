@@ -19,12 +19,58 @@ import { isEmpty } from "lodash-es";
 //     update() {
 //     }
 // }
-class CustomTile extends Phaser.GameObjects.TileSprite {
-    constructor(scene, x, y, textureName, tileconfig) {
-        super(scene, x, y, textureName);
-        Object.assign(this, tileconfig); //get correct assign params
+
+/**
+ * @classdesc
+ * A Tile is a representation of a single tile within the Tilemap. This is a lightweight data
+ * representation, so its position information is stored without factoring in scroll, layer
+ * scale or layer position.
+ *
+ * @class Tile
+ * @memberof Phaser.Tilemaps
+ * @constructor
+ * @since 3.0.0
+ *
+ * @extends Phaser.Tilemaps.Tile
+ *
+ * @param {Phaser.Tilemaps.LayerData} layer - The LayerData object in the Tilemap that this tile belongs to.
+ * @param {integer} index - The unique index of this tile within the map (image index)
+ * @param {integer} x - The x coordinate of this tile in tile coordinates.
+ * @param {integer} y - The y coordinate of this tile in tile coordinates.
+ * @param {integer} width - Width of the tile in pixels.
+ * @param {integer} height - Height of the tile in pixels.
+ * @param {integer} baseWidth - The base width a tile in the map (in pixels). Tiled maps support
+ * multiple tileset sizes within one map, but they are still placed at intervals of the base
+ * tile width.
+ * @param {integer} baseHeight - The base height of the tile in pixels (in pixels). Tiled maps
+ * support multiple tileset sizes within one map, but they are still placed at intervals of the
+ * base tile height.
+ */
+class CustomTile extends Phaser.Tilemaps.Tile {
+    constructor(layer, index, x, y, width, height, tileConfig) {
+        super(layer, index, x, y, width, height);
+        Object.assign(this, tileConfig); //add things like tile.properties
     }
 }
+//EXAMPLE
+// class WallTile extends Phaser.Tilemaps.Tile {
+//     constructor(layer, x, y, width, height, tileconfig) {
+//         const wallTileImgIndex = "PROBABLY A CONSTANT OR ENUM";
+//         super(layer, wallTileImgIndex, x, y, width, height, tileconfig);
+//         this.properties.collides = true;
+//     }
+// }
+// EXAMPLE
+// class LavaTile extends Phaser.Tilemaps.Tile {
+//     constructor(layer, x, y, width, height, tileconfig) {
+//         const lavaTileImgIndex = "PROBABLY A CONSTANT OR ENUM";
+//         super(layer, lavaTileImgIndex, x, y, width, height, tileconfig);
+//         this.properties.collides = true;
+//         this.properties.dmg = 10;
+//         this.properties.dmgType = "fire";
+//     }
+//     probablySomeMethods(){}
+// }
 const TILE_TYPE = {
     wall: 0,
     ground: 19,
@@ -110,6 +156,52 @@ class MapManager {
         this.tileMap = map;
         return this.tileMap;
     }
+    generateMapv2(
+        mapWidth = CST.GRID_WIDTH,
+        mapLength = CST.GRID_LENGTH,
+        tileWidth = CST.TILE_SIZE,
+        tileHeight = CST.TILE_SIZE,
+        layer = null
+    ) {
+        let map = [];
+
+        for (let row = 0; row < mapLength; row++) {
+            map.push([]);
+            for (let col = 0; col < mapWidth; col++) {
+                let tileNum = this.genTileType();
+                const tileConfig = {};
+                tileConfig.properties = {};
+
+                switch (tileNum) {
+                    case TILE_TYPE.ground:
+                        tileConfig.properties.collides = false;
+                        break;
+                    case TILE_TYPE.wall:
+                        tileConfig.properties.collides = true;
+                        break;
+                }
+
+                // may want to replace this by using a TileEntity class
+                // const tileEntity = { col, row, index: tileNum };
+
+                //if we don't add layer here, we need to add it later
+                const tileEntity = new CustomTile(
+                    layer,
+                    tileNum,
+                    col,
+                    row,
+                    tileWidth,
+                    tileHeight,
+                    tileConfig
+                );
+                map[row].push(tileEntity);
+            }
+        }
+        //NOTE: may want to add a paramter toggle for this func(setInternalTileMap = true)
+        //if(setIntTileMap) {
+        this.tileMap = map;
+        return this.tileMap;
+    }
     getTileArray() {
         let output = [];
         this.tileMap.forEach((row) => {
@@ -153,18 +245,35 @@ class MapManager {
     //
     // }
     createMapv2(
+        layerName,
         tileSet,
-        tileMap = [],
         tileWidth = CST.TILE_SIZE,
-        tileHeight = CST.TILE_SIZE
+        tileHeight = CST.TILE_SIZE,
+        mapWidth = CST.GRID_WIDTH,
+        mapLength = CST.GRID_LENGTH,
+        tileMap
     ) {
         //setup tilemap
-        const layer = map.createBlankDynamicLayer();
+        const map = this.scene.make.tilemap({
+            tileWidth: CST.TILE_SIZE,
+            tileHeight: CST.TILE_SIZE,
+        });
+        const layer = map.createBlankDynamicLayer(layerName, tileSet);
         //add tiles
+        if (isEmpty(tileMap) && !isEmpty(this.tileMap)) {
+            tileMap = this.tileMap;
+        } else if (isEmpty(tileMap) && isEmpty(this.tileMap)) {
+            throw new Error("No tileMap passed");
+        }
+        tileMap.flat().forEach((tile) => {
+            tile.layer = layerName;
+            map.putTileAt(tile, tile.x, tile.y);
+        });
+        return [map, layer];
     }
     toString() {
         return this.tileMap;
     }
 }
 
-export { MapManager, TILE_TYPE };
+export { MapManager, TILE_TYPE, CustomTile };

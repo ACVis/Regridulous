@@ -1,4 +1,4 @@
-import Phaser from "phaser";
+import Phaser, { Tilemaps } from "phaser";
 import { CST } from "./src/objects/Constants";
 // import { Enemies } from "./src/objects/Enemies";
 import { Player } from "./src/objects/Player";
