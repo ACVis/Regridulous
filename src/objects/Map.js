@@ -19,6 +19,12 @@ import { isEmpty } from "lodash-es";
 //     update() {
 //     }
 // }
+class CustomTile extends Phaser.GameObjects.TileSprite {
+    constructor(scene, x, y, textureName, tileconfig) {
+        super(scene, x, y, textureName);
+        Object.assign(this, tileconfig); //get correct assign params
+    }
+}
 const TILE_TYPE = {
     wall: 0,
     ground: 19,
@@ -146,6 +152,16 @@ class MapManager {
     // getMapCopy() {
     //
     // }
+    createMapv2(
+        tileSet,
+        tileMap = [],
+        tileWidth = CST.TILE_SIZE,
+        tileHeight = CST.TILE_SIZE
+    ) {
+        //setup tilemap
+        const layer = map.createBlankDynamicLayer();
+        //add tiles
+    }
     toString() {
         return this.tileMap;
     }
