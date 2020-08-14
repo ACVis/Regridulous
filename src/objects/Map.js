@@ -112,12 +112,6 @@ class MapManager {
         });
         return output;
     }
-    getMap() {
-        return this.tileMap;
-    }
-    // getMapCopy() {
-    //
-    // }
     createMap(
         tileSet,
         tileMap = [],
@@ -146,6 +140,12 @@ class MapManager {
         // this.mapLayer = layer;
         return [map, layer];
     }
+    getMap() {
+        return this.tileMap;
+    }
+    // getMapCopy() {
+    //
+    // }
     toString() {
         return this.tileMap;
     }
