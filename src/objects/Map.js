@@ -104,12 +104,45 @@ class MapManager {
         this.tileMap = map;
         return this.tileMap;
     }
-    getTileArray() {
+    getTileArray({test = false} = {}) {
         let output = [];
+        if(test) {
+            output = [
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [19,19,19,19,19,19,19,19,19,19,19,19,19],
+                [0,2,0,0,0,0,19,0,0,0,0,0,0]
+            ];
+        } else {
         this.tileMap.forEach((row) => {
             const mappedRow = row.map((tile) => tile.index);
             output.push(mappedRow);
         });
+        }
+
+        
         return output;
     }
     getMap() {
@@ -124,7 +157,7 @@ class MapManager {
         tileWidth = CST.TILE_SIZE,
         tileHeight = CST.TILE_SIZE
     ) {
-        const internalMap = this.getTileArray();
+        const internalMap = this.getTileArray({test: true});
         //If no tilemap passed and none on object, throw error
         if (isEmpty(tileMap) && isEmpty(internalMap)) {
             throw new Error("No Tilemap Set");
@@ -140,6 +173,7 @@ class MapManager {
             tileWidth: CST.TILE_SIZE,
             tileHeight: CST.TILE_SIZE,
         });
+        // map.setRenderOrder(3); //render from bottom left-up
         const tiles = map.addTilesetImage(tileSet);
 
         const layer = map.createDynamicLayer(0, tiles, 0, 0);

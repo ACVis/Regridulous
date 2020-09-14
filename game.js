@@ -25,7 +25,7 @@ class mainScene {
         let MAP = new MapManager(this);
         MAP.generateMap(CST.GRID_WIDTH, CST.GRID_LENGTH);
         const [map, layer] = MAP.createMap("overworld-tiles");
-
+        console.log("MAP: ", map)
         if (this.debug) console.log(MAP.getMap());
         if (this.debug) console.log(MAP.getTileArray());
 
@@ -132,25 +132,48 @@ class mainScene {
             // takeTurn();
             // this.player.x += CST.TILE_SIZE;
             // console.log(this.player.width, this.player.displayWidth);
+
             this.player.moveEnt({ cols: 1 });
         });
         this.input.keyboard.on("keyup-DOWN", (event) => {
             if (this.debug) console.log("down up!");
             // takeTurn();
             // this.player.y += CST.TILE_SIZE;
-            this.player.moveEnt({ rows: 1 });
+            let moveRows = 1;
+            let moveY = moveRows * CST.TILE_SIZE;
+            if (
+                !(
+                    this.player.row - moveRows < 1 ||
+                    this.player.y - moveY < 0
+                )
+            ) {
+                this.player.moveEnt({ rows: moveRows });
+            }
         });
         this.input.keyboard.on("keyup-LEFT", (event) => {
             if (this.debug) console.log("right up!");
             // takeTurn();
             // this.player.x -= CST.TILE_SIZE;
-            this.player.moveEnt({ cols: -1 });
+            let moveCols = 1;
+            let moveX = moveCols * CST.TILE_SIZE;
+            if (!(this.player.col - moveCols < 0 || this.player.x - moveX < 0)) {
+                this.player.moveEnt({ cols: -moveCols });
+            }
         });
         this.input.keyboard.on("keyup-UP", (event) => {
             if (this.debug) console.log("down up!");
             // takeTurn();
             // this.player.y -= CST.TILE_SIZE;
-            this.player.moveEnt({ rows: -1 });
+            let moveRows = 1;
+            let moveY = moveRows * CST.TILE_SIZE;
+            if (
+                !(
+                    this.player.row + moveRows > CST.GRID_LENGTH ||
+                    this.player.y + moveY > CST.GRID_PIXEL_LENGTH
+                )
+            ) {
+                this.player.moveEnt({ rows: -moveRows });
+            }
         });
 
         this.arrow = this.input.keyboard.createCursorKeys();

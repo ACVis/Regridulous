@@ -1,2 +1,8 @@
 row tools/system is backwards. row "1" is actually the last row. need to convert soemwhere
 Use the phaser-ui scrollable container for spell list
+
+9/13
+moveByCR({rows: -1}) moves up, but Utils count bottom row (technically 26 in tilemap array) as row 1 - so acording to utils you would actually be doing {rows: +1} to go up. These need to be unified in the definition of what is up and down. 
+One option is potentially just not messing with it and keeping the top row as row 1 and then the bottom row (where player starts) as row 26.
+That would mirror how x and y work, where top left is y:0 and bottom left would be something like y:400, so to move up from the bttom, you have to subtract from the y val.
+OR maybe we prefix one set of tools with "inverted_" (the utils that do math)

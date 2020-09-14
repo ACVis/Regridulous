@@ -3,10 +3,15 @@ const TILE_SIZE = 16;
 const GRID_WIDTH = 13;
 const GRID_LENGTH = GRID_WIDTH * 2;
 
+const GRID_PIXEL_WIDTH = GRID_WIDTH * TILE_SIZE;
+const GRID_PIXEL_LENGTH = GRID_LENGTH * TILE_SIZE;
+
 const CST = Object.freeze({
     TILE_SIZE,
     GRID_WIDTH,
     GRID_LENGTH,
+    GRID_PIXEL_WIDTH,
+    GRID_PIXEL_LENGTH,
     WINDOW_WIDTH: (GRID_WIDTH + 0) * TILE_SIZE * 2,
     WINDOW_HEIGHT: (GRID_LENGTH + 0) * TILE_SIZE,
     /* Could do either, or both of these:

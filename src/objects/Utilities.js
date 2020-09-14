@@ -7,11 +7,17 @@ function XYtoRC(x, y) {
     return [row, col];
 }
 function YtoRow(y) {
-    const row = (CST.TILE_SIZE * (CST.GRID_LENGTH - 1)) / y;
+    //26 - Y / 16 
+    
+    const row = CST.GRID_LENGTH - y / CST.TILE_SIZE;
+    //old and incorrect
+    // const row = (CST.TILE_SIZE * (CST.GRID_LENGTH - 1)) / y;
     return row;
 }
 function XtoCol(x) {
-    const col = (CST.TILE_SIZE * (CST.GRID_WIDTH - 1)) / x;
+    const col = x / CST.TILE_SIZE - 1;
+    //old and incorrect
+    // const col = (CST.TILE_SIZE * (CST.GRID_WIDTH - 1)) / x;
     return col;
 }
 function RCtoXY(row, col) {
