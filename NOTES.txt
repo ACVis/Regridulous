@@ -6,3 +6,94 @@ moveByCR({rows: -1}) moves up, but Utils count bottom row (technically 26 in til
 One option is potentially just not messing with it and keeping the top row as row 1 and then the bottom row (where player starts) as row 26.
 That would mirror how x and y work, where top left is y:0 and bottom left would be something like y:400, so to move up from the bttom, you have to subtract from the y val.
 OR maybe we prefix one set of tools with "inverted_" (the utils that do math)
+Revelation?
+I don't think I need a FSM on player itself for CONTROLS. The state of the controls belongs to the game or scene. 
+Mouse clicks are going to be changing some state of UI/Game (are we ina menu and can player/entities do anything while we're in this menu(no)), then this UI fires off some player event.
+
+However, the ControlsState will pass controls to the appropriate sub-state handler. In Default (MoveAndScout) state, Player handles
+controls. As soon as ControlsState == Menu, Player no longer gets input. 
+
+Difference between handleInput and update is that handleInput is ONLY called on input and update is called EVERY frame.
+///////////
+GIT Merge/Rebase
+///////////
+
+git commit -a -m "current working changes"
+git checkout master
+git pull
+git checkout working-branch
+git rebase master
+...
+git commit -a -m "final working changes"
+git checkout master
+git merge working-branch
+
+///////////
+RANDOM
+///////////
+
+    /*
+            //Stat Type
+            {
+                Health: 100
+                Defense: X
+                Dodge: X
+                APcharge: 4 // Action points gained per turn
+                MaxAP: 16 //Max amount of Action Points allowed to bank
+                ...
+
+                debuffs: [
+                    //These are SUBTRACTED from stats upon evaluation/use of player stats
+                    //A Bebuff Type would extend the Stat type, but add a ap/turn duration
+                    //these would be added and subtracted, having a action/turn based effect lifetime
+                ]
+                buffs: [
+                    //These are ADDED from stats upon evaluation/use of player stats
+                    //A Buff Type would extend the Stat type, but add a ap/turn duration
+                    //these would be added, having a action/turn based effect lifetime
+                ]
+                mods: [
+                    //these are more permanent effects, not based on time, their effects can be both negative and positive in one mod
+                    //example- Mechanical Arms: give you extra attack damage, but reduce your APrecharge per turn by 1
+                ]
+
+            }
+        */
+
+    // How does initiative work
+    // Enemy turn order is decided like this:
+    // If multiple enemies tie on the number/stat, then they move to the next tie breaker
+    // 1. Initiative base stat
+    // 2. Distance to player
+    // 3. Random roll tie breaker
+
+    // If this doesn't work, consider making it totally random?
+    takeTurn() {
+        // player actions
+        // enemy actions
+        // map moves
+
+        //PLAYER
+        //reset/set AP
+        //spend AP or bank AP/pass
+        // Actions
+        //Move
+        //Check collision
+        //Effect
+        //Use item, spell, attack
+        // Bank
+        // Add remaining AP to bank, no more than max
+        //ENEMY
+
+        //is this a turn?
+
+        if (actionsTillTurn <= 0) {
+            isTurn = true;
+        }
+
+        if (isTurn) {
+            //enemies
+        }
+    }
+
+    

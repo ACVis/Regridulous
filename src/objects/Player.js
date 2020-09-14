@@ -1,7 +1,8 @@
 import Phaser from "phaser";
 import { Entity } from "./Entity";
 import { CST } from "./Constants";
-import { action_Move } from "./Actions";
+import { StateMachine, State } from "./StateMachine";
+// import { action_Move } from "./Actions";
 const statMixin = {
     Health: 100,
     Defense: 10,
@@ -63,18 +64,71 @@ const basic = {
 //         // scene.sys.displayList.add(this);
 //     }
 // }
+
+class DefaultState extends State {
+    constructor(config) {
+        super(config);
+    }
+
+    handleInput = (input) => {
+        if (input.code == "ArrowRight") {
+            // this.takeTurn();
+            this.subject.x += CST.TILE_SIZE;
+            console.log(this.subject.width, this.subject.displayWidth);
+
+            console.log("right up!");
+        } else if (input.code == "ArrowDown") {
+            // this.takeTurn();
+            this.subject.y += CST.TILE_SIZE;
+
+            console.log("down down!");
+        } else if (input.code == "ArrowLeft") {
+            // this.takeTurn();
+            this.subject.x -= CST.TILE_SIZE;
+            console.log("right up!");
+        } else if (input.code == "ArrowUp") {
+            // this.takeTurn();
+            this.subject.y -= CST.TILE_SIZE;
+
+            console.log("down up!");
+        }
+    };
+
+    update(player) {
+        // this.velocityY = JUMP_VELOCITY;
+    }
+
+    // enter(player) {
+    //     player.setGraphics(IMAGE_JUMP);
+    // }
+}
+const STATE_LIST = {
+    default: DefaultState,
+};
 class Player extends Entity {
     constructor(scene, x, y, textureName = CST.IMGS.KEYS.PLAYER, frame) {
         super(scene, x, y, textureName);
         // this.addAction(action_Move);
+        // this.state = new DefaultState();
+        // this.equipment = new Gun();
+        this.scene = scene;
+        this.state = new StateMachine(STATE_LIST.default, STATE_LIST, {
+            scene,
+            subject: this,
+        });
+    }
+
+    handleInput(input) {
+        this.state.handleInput(input);
+    }
+
+    update() {
+        this.state.update();
     }
     //we would have to call this create() function if we didnt add Player to the Factory
     create() {
         // 3.2 add to scene
         // scene.add.existing(this);
-    }
-    update() {
-        //take turn
     }
     // spawn(){}
     // despawn(){} //destroy the enemy or deactivate
@@ -96,3 +150,90 @@ Phaser.GameObjects.GameObjectFactory.register(CST.IMGS.KEYS.PLAYER, function (
 
     return player;
 });
+
+class PlayerState {
+    constructor() {}
+
+    handleInput(player, input) {
+        if (input == PRESS_DOWN) {
+            return new DuckingState();
+        }
+
+        return null;
+    }
+
+    update(player) {}
+
+    static standing = "standing";
+    static ducking = "ducking";
+    static jumping = "jumping";
+    static diving = "diving";
+}
+////////////////////////////////////////////
+// Old Example States
+////////////////////////////////////////////
+// class OnGroundState extends PlayerState {
+//     static handleInput(player, input) {
+//         if (input == PRESS_B) {
+//             //jump
+//         } else if (input == PRESS_DOWN) {
+//             // duck
+//         }
+//     }
+// }
+
+// class DuckingState extends OnGroundState {
+//     constructor() {
+//         this.chargeTime = 0;
+//     }
+
+//     handleInput(player, input) {
+//         if (input == RELEASE_DOWN) {
+//             return new StandingState();
+//         } else {
+//             OnGroundState.handleInput(player, input);
+//         }
+//     }
+
+//     update(player) {
+//         this.chargeTime += 1;
+//         if (this.chargeTime > MAX_CHARGE) {
+//             player.superBomb();
+//         }
+//     }
+// }
+// class StandingState extends PlayerState {
+//     constructor() {}
+
+//     handleInput(player, input) {
+//         if (input == PRESS_B) {
+//             player.state = PlayerState.jumping;
+//         }
+//     }
+
+//     update(player) {
+//         this.velocityY = JUMP_VELOCITY;
+//     }
+
+//     enter(player) {
+//         player.setGraphics(IMAGE_JUMP);
+//     }
+// }
+// class JumpingState {
+//     constructor(player) {
+//         // apply initial up velocity to player
+//     }
+
+//     handleInput(player, input) {}
+
+//     update(player) {
+//         if (player.isOnGround()) {
+//             return new StandingState();
+//         } else {
+//             player.applyForce(GRAVITY);
+//         }
+//     }
+// }
+////////////////////////////////////////////
+// Old Example States
+////////////////////////////////////////////

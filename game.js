@@ -5,9 +5,57 @@ import { Player } from "./src/objects/Player";
 import { MapManager } from "./src/objects/Map";
 import { EnemyManager } from "./src/objects/Enemies";
 import { Utils, Random } from "./src/objects/Utilities";
+import { StateMachine, State } from "./src/objects/StateMachine";
 import images from "./assets/*.png";
 import tileset from "./assets/tileset/*.png";
 import { TextSprite } from "phaser-ui-tools";
+
+// class State {
+//     name = "DefaultControlState";
+//     constructor({ debug = false } = {}) {
+//         this.debug = debug;
+//     }
+
+//     handleInput(subject, input) {}
+
+//     update(subject) {}
+
+//     enter(subject) {
+//         if (this.debug) {
+//             console.log("Entered " + this.name ? this.name : "Unnamed State");
+//         }
+//     }
+//     exit() {}
+// }
+
+class DefaultControlState extends State {
+    constructor(config) {
+        super(config);
+    }
+    handleInput = (keyevent) => {
+        this.subject.handleInput(keyevent);
+
+        if ("activates menu somehow") {
+            this.transition(STATE_LIST.menu);
+        }
+    };
+    update() {
+        this.subject.update();
+    }
+}
+class InventoryControlState extends State {
+    handleInput(keyevent) {}
+    update() {}
+}
+class MenuControlState extends State {
+    handleInput(keyevent) {}
+    update() {}
+}
+const STATE_LIST = {
+    default: DefaultControlState,
+    inventory: InventoryControlState,
+    menu: MenuControlState,
+};
 
 class mainScene {
     preload() {
@@ -30,9 +78,9 @@ class mainScene {
         if (this.debug) console.log(MAP.getTileArray());
 
         //Create Enemies
-        // const ENEMIES = new EnemyManager(this, MAP.getTileArray());
+        const ENEMIES = new EnemyManager(this, MAP.getTileArray());
         //This adds enemies as sprites for now
-        // ENEMIES.addEnemies(MAP.getTileArray());
+        ENEMIES.addEnemies(MAP.getTileArray());
 
         //Create Player
         const gridHalf = Math.floor(CST.GRID_WIDTH / 2);
@@ -42,8 +90,35 @@ class mainScene {
         //Set Player debug mode
         this.player.debug = true;
 
-        let actionsTillTurn = 2;
-        let isTurn = false;
+        //Set default state for controls
+        this.ControlState = new StateMachine(STATE_LIST.default, STATE_LIST, {
+            scene: this,
+            subject: this.player,
+        });
+
+        //Could probably provide accessor functions, getters on actual player class and contain the statemachine there
+        // this.PlayerState = new StateMachine("", {}, [this, this.player]);
+
+        this.input.keyboard.on("keyup", (event) => {
+            console.dir(event);
+            this.ControlState.handleInput(event);
+        });
+        this.input.on("pointerup", (pointer) => {
+            if (this.debug) console.log("Pointer Event: ", pointer);
+            this.ControlState.handleInput(pointer);
+            //     if (pointer.leftButtonReleased()) {
+            //         console.log("Left Button was released");
+            //     } else if (pointer.rightButtonReleased()) {
+            //         console.log("Right Button was released");
+            //     } else if (pointer.middleButtonReleased()) {
+            //         console.log("Middle Button was released");
+            //     } else if (pointer.backButtonReleased()) {
+            //         console.log("Back Button was released");
+            //     } else if (pointer.forwardButtonReleased()) {
+            //         console.log("Forward Button was released");
+            //     }
+        });
+        // Handle Turns/Actions?
 
         //Create UI
 
@@ -52,69 +127,7 @@ class mainScene {
             CST.TILE_SIZE,
             "UI OVER HERE"
         );
-        /*
-            //Stat Type
-            {
-                Health: 100
-                Defense: X
-                Dodge: X
-                APcharge: 4 // Action points gained per turn
-                MaxAP: 16 //Max amount of Action Points allowed to bank
-                ...
 
-                debuffs: [
-                    //These are SUBTRACTED from stats upon evaluation/use of player stats
-                    //A Bebuff Type would extend the Stat type, but add a ap/turn duration
-                    //these would be added and subtracted, having a action/turn based effect lifetime
-                ]
-                buffs: [
-                    //These are ADDED from stats upon evaluation/use of player stats
-                    //A Buff Type would extend the Stat type, but add a ap/turn duration
-                    //these would be added, having a action/turn based effect lifetime
-                ]
-                mods: [
-                    //these are more permanent effects, not based on time, their effects can be both negative and positive in one mod
-                    //example- Mechanical Arms: give you extra attack damage, but reduce your APrecharge per turn by 1
-                ]
-
-            }
-        */
-
-        // How does initiative work
-        // Enemy turn order is decided like this:
-        // If multiple enemies tie on the number/stat, then they move to the next tie breaker
-        // 1. Initiative base stat
-        // 2. Distance to player
-        // 3. Random roll tie breaker
-
-        // If this doesn't work, consider making it totally random?
-        function takeTurn() {
-            // player actions
-            // enemy actions
-            // map moves
-
-            //PLAYER
-            //reset/set AP
-            //spend AP or bank AP/pass
-            // Actions
-            //Move
-            //Check collision
-            //Effect
-            //Use item, spell, attack
-            // Bank
-            // Add remaining AP to bank, no more than max
-            //ENEMY
-
-            //is this a turn?
-
-            if (actionsTillTurn <= 0) {
-                isTurn = true;
-            }
-
-            if (isTurn) {
-                //enemies
-            }
-        }
         //NOTE:
         /*
         Do statemachine for controls
@@ -177,10 +190,13 @@ class mainScene {
         });
 
         this.arrow = this.input.keyboard.createCursorKeys();
-        console.log("Map Width: ", map.widthInPixels);
-        console.log("Player X Y: ", this.player.x, this.player.y);
-        console.log("Player col row: ", this.player.col, this.player.row);
+        if (this.debug) console.log("Map Width: ", map.widthInPixels);
+        if (this.debug)
+            console.log("Player X Y: ", this.player.x, this.player.y);
+        if (this.debug)
+            console.log("Player col row: ", this.player.col, this.player.row);
 
+        //Setup cameras
         const camera = this.cameras.main;
         this.cameras.main
             // .setZoom(1.5)
@@ -192,21 +208,9 @@ class mainScene {
     }
 
     update() {
-        // if (this.physics.overlap(this.player, this.coin)) {
-        //     this.hit();
-        // }
-        // if (this.arrow.right.isDown) {
-        //     this.player.x += 3;
-        //     console.log("DOWN!");
-        // } else if (this.arrow.left.isDown) {
-        //     this.player.x -= 3;
-        // }
-        // if (this.arrow.down.isDown) {
-        //     this.player.y += 3;
-        // } else if (this.arrow.up.isDown) {
-        //     this.player.y -= 3;
-        // }
+        this.ControlState.update();
     }
 }
+
 // export { mainScene };
 new Phaser.Game(Object.assign(CST.CONFIGS.config4, { scene: mainScene }));
