@@ -102,8 +102,12 @@ class DefaultState extends State {
             false,
             this.scene.cameras.main
         );
-        console.log("Player rc", rightTile.x, rightTile.y);
-        console.log(this.scene.map, rightTile);
+        console.log("LEFT", leftTile);
+        console.log("RIGHT", rightTile);
+        console.log("UP", upTile);
+        console.log("DOWN", downTile);
+        // console.log("Player rc", rightTile.x, rightTile.y);
+        // console.log(this.scene.map, rightTile);
         rightTile.setAlpha(0.2);
         if (input.code == "ArrowRight") {
             // this.takeTurn();

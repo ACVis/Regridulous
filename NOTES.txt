@@ -9,6 +9,15 @@ However, the ControlsState will pass controls to the appropriate sub-state handl
 controls. As soon as ControlsState == Menu, Player no longer gets input. 
 
 Difference between handleInput and update is that handleInput is ONLY called on input and update is called EVERY frame.
+
+// Probably useful:
+// * Creates a Sprite for every object matching the given tile indexes in the layer. You can
+// * optionally specify if each tile will be replaced with a new tile after the Sprite has been
+// * created. This is useful if you want to lay down special tiles in a level that are converted to
+// * Sprites, but want to replace the tile itself with a floor tile or similar once converted.
+// *
+// * @method Phaser.Tilemaps.Tilemap#createFromTiles
+
 ///////////
 GIT Merge/Rebase
 ///////////
